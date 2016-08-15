@@ -20,12 +20,13 @@
     "node": ">=4.1.1"
   },
   "dependencies": {
+    "bcrypt": "0.8.7",
     "boom": "3.2.2",
     "fs": "0.0.2",
     "good": "6.6.0",
     "good-console": "5.3.1",
     "hapi": "14.1.0",
-    "hapi-auth-jwt2": "^7.0.1",
+    "hapi-auth-jwt2": "7.0.1",
     "hapi-swagger": "6.2.2",
     "inert": "4.0.1",
     "joi": "9.0.4",

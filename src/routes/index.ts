@@ -1,6 +1,8 @@
 import * as Hapi from "hapi";
 import TaskController from '../controllers/taskController';
+import UserController from '../controllers/user.controller';
 import TaskRepository from '../libs/repository/mongo/taskRepository';
+import UserRepository from '../libs/repository/mongo/userRepository';
 
 export default function(server: Hapi.Server) {
 
@@ -42,7 +44,18 @@ export default function(server: Hapi.Server) {
     });
 
 
-    // Public file serving
+	// Signup Route
+	const userController = new UserController(server, new UserRepository());
+
+	server.route({
+		method: 'POST',
+		path: '/api/signup',
+		handler: undefined,
+		config: userController.createUser()
+	});
+
+
+    // Serve Static Files for the SPA app.
     server.route({
         method: 'GET',
         path: '/{path*}',

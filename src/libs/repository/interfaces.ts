@@ -20,6 +20,16 @@ export interface IRepository<T extends IEntity> {
     create(entity: T): Promise<T>; 
 }
 
-export interface ITaskRepository extends IRepository<ITask> {
+export interface ITaskRepository extends IRepository<ITask> {}
 
+// User Model Interfaces
+export interface IUser extends IEntity {
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+    isActive: boolean,
+	lastLogin: boolean
 }
+
+export interface IUserRepository extends IRepository<IUser> {}

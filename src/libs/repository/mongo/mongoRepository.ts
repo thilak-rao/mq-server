@@ -36,7 +36,7 @@ abstract class MongoRepository<T extends IEntity> implements IRepository<IEntity
         });
     }
 
-    public findByIdAndUpdate(id: string, entity: T): Promise<T> {
+    public findByIdAndUpdate(id: string, entity: T): Promise<any> {
         return this.collection.then((collection: MongoDb.Collection) => {
             entity.updatedAt = new Date();
             return collection.updateOne({ _id: id }, entity).then((result) => {
@@ -51,8 +51,8 @@ abstract class MongoRepository<T extends IEntity> implements IRepository<IEntity
         });
     }
 
-    public create(entity: T): Promise<T> {
-        
+
+    public create(entity: T): Promise<any> {
         entity._id = UUID.v4();
         return this.collection.then((collection: MongoDb.Collection) => {
             entity.createdDate = new Date();
