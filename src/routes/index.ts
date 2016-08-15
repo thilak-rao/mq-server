@@ -54,6 +54,13 @@ export default function(server: Hapi.Server) {
 		config: userController.createUser()
 	});
 
+	server.route({
+		method: 'POST',
+		path: '/api/login',
+		handler: undefined,
+		config: userController.loginUser()
+	});
+
 
     // Serve Static Files for the SPA app.
     server.route({

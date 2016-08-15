@@ -8,3 +8,8 @@ export const createUserModel = Joi.object().keys({
 	lastLogin: Joi.string(),
 	isActive : Joi.bool()
 });
+
+export const loginModel = Joi.object().keys({
+	email    : Joi.string().email().required(),
+	password : Joi.string().regex(/.{8,30}$/).required()
+});

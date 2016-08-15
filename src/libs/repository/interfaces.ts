@@ -29,7 +29,7 @@ export interface IUser extends IEntity {
     email: string,
     password: string,
     isActive: boolean,
-	lastLogin: boolean
+	lastLogin: Date
 }
 
 export interface IUserRepository extends IRepository<IUser> {}
