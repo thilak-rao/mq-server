@@ -4,6 +4,7 @@ import * as Joi from "joi";
 import * as Bcrypt from "bcrypt";
 import BaseController from './baseController';
 import * as UserModel from '../models/user.model';
+import { USERROLES } from '../configs/CONSTANTS'
 import { IUser, IUserRepository } from '../libs/repository/interfaces'
 
 export default class userController extends BaseController {
@@ -38,6 +39,7 @@ export default class userController extends BaseController {
 					    newUser.email     = request.payload.email;
 					    newUser.password  = hash;
 					    newUser.isActive  = false;
+					    newUser.userRole  = USERROLES.STUDENT;
 					    newUser.lastLogin = new Date();
 
 					    this.userRepository.create(newUser)
@@ -93,7 +95,7 @@ export default class userController extends BaseController {
 				'hapi-swagger': {
 					responses: {
 						'201': {
-							'description': 'User login service',
+							'description': 'Logs users into app',
 							'schema': UserModel.loginModel
 						}
 					}

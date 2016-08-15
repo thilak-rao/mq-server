@@ -29,6 +29,7 @@ export interface IUser extends IEntity {
     email: string,
     password: string,
     isActive: boolean,
+    userRole: string,
 	lastLogin: Date
 }
 
