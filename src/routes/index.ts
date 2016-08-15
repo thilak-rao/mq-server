@@ -2,7 +2,6 @@ import * as Hapi from "hapi";
 import TaskController from '../controllers/taskController';
 import TaskRepository from '../libs/repository/mongo/taskRepository';
 
-
 export default function(server: Hapi.Server) {
 
     const taskController = new TaskController(server, new TaskRepository());
@@ -40,5 +39,18 @@ export default function(server: Hapi.Server) {
         path: '/api/tasks',
         handler: undefined,
         config: taskController.createTask()
+    });
+
+
+    // Public file serving
+    server.route({
+        method: 'GET',
+        path: '/{path*}',
+	    handler: {
+		    directory: {
+			    path   : '.',
+			    listing: true
+		    }
+	    }
     });
 }

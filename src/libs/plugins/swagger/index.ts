@@ -1,6 +1,5 @@
 import {IPlugin, IPluginInfo} from '../interfaces'
 import * as Hapi from 'hapi'
-const Inert = require('inert');
 const Vision = require('vision');
 const HapiSwagger = require('hapi-swagger');
 
@@ -8,7 +7,6 @@ export default (): IPlugin => {
     return {
         register: (server: Hapi.Server) => {
             server.register([
-                Inert,
                 Vision,
                 {
                     register: HapiSwagger,

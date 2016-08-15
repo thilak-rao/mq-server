@@ -10,11 +10,13 @@ var mocha = require('gulp-mocha')
 var istanbul = require('gulp-istanbul')
 
 // /*  Variables */
-let tsProject = tsc.createProject('tsconfig.json')
-let sourceFiles = 'src/**/*.ts'
-let testFiles = 'test/**/*.ts'
-let outDir = require('./tsconfig.json').compilerOptions.outDir
-let entryPoint = './build/src/server.js'
+let tsProject = tsc.createProject('tsconfig.json');
+let sourceFiles = 'src/**/*.ts';
+let testFiles = 'test/**/*.ts';
+let publicFiles = 'src/public/**/*';
+let publicFilesOut = 'build/src/public';
+let outDir = require('./tsconfig.json').compilerOptions.outDir;
+let entryPoint = './build/src/server.js';
 
 /**
  * Remove build directory.
@@ -32,6 +34,14 @@ gulp.task('tslint', () => {
     return gulp.src(sourceFiles)
         .pipe(tslint())
         .pipe(tslint.report('verbose'))
+})
+
+/**
+ * Copy public files
+ */
+gulp.task('copy-public', ['compile'], () => {
+    return gulp.src(publicFiles)
+        .pipe(gulp.dest(publicFilesOut));
 })
 
 /**
@@ -53,12 +63,16 @@ gulp.task('watch', function() {
     gulp.watch([sourceFiles], ['compile']).on('change', (e) => {
         console.log('TypeScript file ' + e.path + ' has been changed. Compiling.')
     })
+
+    gulp.watch([publicFiles], ['copy-public']).on('change', (e) => {
+        console.log('Client side file ' + e.path + ' has been changed. Copying.')
+    })
 })
 
 /**
  * Build the project.
  */
-gulp.task('build', ['compile'], () => {
+gulp.task('build', ['copy-public'], () => {
     console.log('Building the project ...')
 })
 
