@@ -1,24 +1,23 @@
-# typescript-node
-
-[![Build Status](https://travis-ci.org/dwyl/hapi-typescript-example.svg?branch=master)](https://travis-ci.org/dwyl/hapi-typescript-example)
-
-This is a very simple template project for node and typescript projects.
+# MagicQuill
 
 **Installation**
 
 * *npm install* (Install node packages)
 * *typings install* (Install typings)
 
+**Dependencies**
+
+*  node v4.x.x
+
 **Run**
 
-* *gulp build* (Build TS files)
-* *gulp test* (Run mocha tests)
-* *gulp tslint* (Run tslint)
-* *gulp nodemon* (Run nodemon and watch ts files)
+* gulp build - Build TS files
+* gulp test - Run mocha tests
+* gulp tslint - Run tslint
+* gulp nodemon - Run nodemon and watch ts files
 
+**API Documentation**
 
-Running on port 3000 ex: localhost:3000/documentation
+MagicQuill uses Swagger for API documentation. Running on port 3000 ex: localhost:3000/documentation
 
-
-Have fun :)
 
