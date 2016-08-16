@@ -1,10 +1,10 @@
 import * as Hapi from "hapi";
 import * as Boom from "boom";
-import * as Joi from "joi";
 import * as Bcrypt from "bcrypt";
+import * as JWT from "jsonwebtoken";
 import BaseController from './baseController';
 import * as UserModel from '../models/user.model';
-import { USERROLES } from '../configs/CONSTANTS'
+import { USERROLES, JWTSECRET } from '../configs/CONSTANTS'
 import { IUser, IUserRepository } from '../libs/repository/interfaces'
 
 export default class userController extends BaseController {
@@ -54,6 +54,7 @@ export default class userController extends BaseController {
 				    	reply(Boom.badRequest('User already exists'));
 					});
 			},
+			auth: false,
 			tags: ['api', 'user', 'signup'],
 			description: 'Creates a new user account',
 			validate: {
@@ -77,17 +78,23 @@ export default class userController extends BaseController {
 			handler: (request: Hapi.Request, reply: Hapi.IReply) => {
 				this.verifyCredentials(request.payload.email, request.payload.password)
 					.then((user: IUser) => {
-						// User logged in, change lastLogin timestamp
+						const token = this.createToken(user);
+						let { userRole } = user;
+						reply({
+							token,
+							userRole
+						}).code(201);
+
 						user.lastLogin = new Date();
 						this.userRepository.findByIdAndUpdate(user._id, user);
-						reply(user).code(201);
 					})
 					.catch((error) => {
 						reply(Boom.badRequest(error));
 					})
 			},
+			auth: false,
 			tags: ['api', 'user', 'login'],
-			description: 'User login service',
+			description: 'Logs users into app',
 			validate: {
 				payload: UserModel.loginModel
 			},
@@ -161,5 +168,13 @@ export default class userController extends BaseController {
 				})
 			})
 		});
+	}
+
+	private createToken(user: IUser) {
+		const { _id, email } = user;
+		return JWT.sign({
+			_id,
+			email
+		}, JWTSECRET);
 	}
 }
