@@ -4,3 +4,6 @@ export const USERROLES = {
 	LECTURER: 'lecturer',
 	ADMIN   : 'admin'
 }
+export const STATUS = {
+	SUCCESSFUL : 'successful',
+}

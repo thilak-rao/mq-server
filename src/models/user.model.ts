@@ -10,7 +10,12 @@ export const createUserModel = Joi.object().keys({
 	isActive : Joi.bool()
 });
 
-export const loginModel = Joi.object().keys({
+export const authenticationModel = Joi.object().keys({
+	email    : Joi.string().email().required(),
+	password : Joi.string().regex(/.{8,30}$/).required()
+});
+
+export const deleteUserModel = Joi.object().keys({
 	email    : Joi.string().email().required(),
 	password : Joi.string().regex(/.{8,30}$/).required()
 });

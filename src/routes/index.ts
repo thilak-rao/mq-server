@@ -49,7 +49,7 @@ export default function(server: Hapi.Server) {
 
 	server.route({
 		method: 'POST',
-		path: '/api/signup',
+		path: '/api/user',
 		handler: undefined,
 		config: userController.createUser()
 	});
@@ -58,7 +58,15 @@ export default function(server: Hapi.Server) {
 		method: 'POST',
 		path: '/api/login',
 		handler: undefined,
-		config: userController.loginUser()
+		config: userController.authenticateUser()
+	});
+
+
+	server.route({
+		method: 'DELETE',
+		path: '/api/user',
+		handler: undefined,
+		config: userController.deleteUser()
 	});
 
 

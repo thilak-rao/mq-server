@@ -4,7 +4,7 @@ import * as Bcrypt from "bcrypt";
 import * as JWT from "jsonwebtoken";
 import BaseController from './baseController';
 import * as UserModel from '../models/user.model';
-import { USERROLES, JWTSECRET } from '../configs/CONSTANTS'
+import { USERROLES, JWTSECRET, STATUS } from '../configs/CONSTANTS'
 import { IUser, IUserRepository } from '../libs/repository/interfaces'
 
 export default class userController extends BaseController {
@@ -14,7 +14,7 @@ export default class userController extends BaseController {
 		super(server);
 		this.userRepository = userRepository;
 	}
-
+	
 	public createUser(): Hapi.IRouteAdditionalConfigurationOptions {
 		return {
 			handler: (request: Hapi.Request, reply: Hapi.IReply) => {
@@ -33,7 +33,7 @@ export default class userController extends BaseController {
 					    return hash;
 				    })
 				    .then((hash) => {
-					    let newUser: IUser;
+					    let newUser: IUser = <IUser>{};
 					    newUser.firstName = request.payload.firstName;
 					    newUser.lastName  = request.payload.lastName;
 					    newUser.email     = request.payload.email;
@@ -50,16 +50,17 @@ export default class userController extends BaseController {
 					        	reply(Boom.badImplementation(error))
 					        });
 				    })
-				    .catch(() => {
-				    	reply(Boom.badRequest('User already exists'));
+				    .catch((error) => {
+					    console.log(error);
+				    	reply(Boom.badRequest('Could not create user. Please try again later or contact support'));
 					});
 			},
 			auth: false,
-			tags: ['api', 'user', 'signup'],
-			description: 'Creates a new user account',
 			validate: {
 				payload: UserModel.createUserModel
 			},
+			tags: ['api', 'user', 'signup'],
+			description: 'Creates a new user account',
 			plugins: {
 				'hapi-swagger': {
 					responses: {
@@ -73,7 +74,7 @@ export default class userController extends BaseController {
 		}
 	}
 
-	public loginUser(): Hapi.IRouteAdditionalConfigurationOptions {
+	public authenticateUser(): Hapi.IRouteAdditionalConfigurationOptions {
 		return {
 			handler: (request: Hapi.Request, reply: Hapi.IReply) => {
 				this.verifyCredentials(request.payload.email, request.payload.password)
@@ -90,24 +91,49 @@ export default class userController extends BaseController {
 					})
 					.catch((error) => {
 						reply(Boom.badRequest(error));
-					})
+					});
 			},
 			auth: false,
+			validate: {
+				payload: UserModel.authenticationModel
+			},
 			tags: ['api', 'user', 'login'],
 			description: 'Logs users into app',
-			validate: {
-				payload: UserModel.loginModel
-			},
 			plugins: {
 				'hapi-swagger': {
 					responses: {
 						'201': {
 							'description': 'Logs users into app',
-							'schema': UserModel.loginModel
+							'schema': UserModel.authenticationModel
 						}
 					}
 				}
 			}
+		}
+	}
+
+	public deleteUser(): Hapi.IRouteAdditionalConfigurationOptions {
+		return {
+			handler: (request: Hapi.Request, reply: Hapi.IReply) => {
+				this.verifyCredentials(request.payload.email, request.payload.password)
+				    .then((user: IUser) => {
+				    	this.userRepository.findByIdAndDelete(user._id)
+					        .then((results) => {
+						        reply({
+						        	status: STATUS.SUCCESSFUL
+						        }).code(201);
+					        })
+					        .catch(error => reply(Boom.badImplementation(error)));
+				    })
+				    .catch((error) => {
+					    reply(Boom.badData('Incorrect Password'));
+				    });
+			},
+			validate: {
+				payload: UserModel.deleteUserModel
+			},
+			tags: ['api', 'user', 'delete'],
+			description: 'Deletes user account'
 		}
 	}
 
@@ -144,7 +170,7 @@ export default class userController extends BaseController {
 				if(!user.length) {
 					return resolve();
 				} else {
-					return reject('User exists');
+					return reject('User already exists');
 				}
 			});
 		});
