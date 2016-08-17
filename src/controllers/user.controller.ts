@@ -14,13 +14,13 @@ export default class userController extends BaseController {
 		super(server);
 		this.userRepository = userRepository;
 	}
-	
+
 	public createUser(): Hapi.IRouteAdditionalConfigurationOptions {
 		return {
 			handler: (request: Hapi.Request, reply: Hapi.IReply) => {
 				this.verifyUniqueUser(request.payload.email)
 				    .then(() => {
-				    	// Build hash from Password
+				    	// Generate Hash from Password
 				    	let hash: Promise<any>;
 					    hash = this.hashPassword(request.payload.password)
 					               .then((hash) => {
@@ -33,6 +33,7 @@ export default class userController extends BaseController {
 					    return hash;
 				    })
 				    .then((hash) => {
+				    	// Persist User in Mongo
 					    let newUser: IUser = <IUser>{};
 					    newUser.firstName = request.payload.firstName;
 					    newUser.lastName  = request.payload.lastName;
@@ -103,7 +104,7 @@ export default class userController extends BaseController {
 				'hapi-swagger': {
 					responses: {
 						'201': {
-							'description': 'Logs users into app',
+							'description': 'Logs users to access MagicQuill resources, and returns a JSON Web Token',
 							'schema': UserModel.authenticationModel
 						}
 					}
@@ -126,6 +127,7 @@ export default class userController extends BaseController {
 					        .catch(error => reply(Boom.badImplementation(error)));
 				    })
 				    .catch((error) => {
+				    	console.log(error);
 					    reply(Boom.badData('Incorrect Password'));
 				    });
 			},
@@ -133,7 +135,20 @@ export default class userController extends BaseController {
 				payload: UserModel.deleteUserModel
 			},
 			tags: ['api', 'user', 'delete'],
-			description: 'Deletes user account'
+			description: 'Deletes user account',
+			plugins: {
+				'hapi-swagger': {
+					responses: {
+						'201': {
+							'description': 'Deletes a given MagicQuill user account',
+							'schema': UserModel.deleteUserModel
+						}
+					},
+					security: [{
+						'jwt': []
+					}]
+				}
+			}
 		}
 	}
 

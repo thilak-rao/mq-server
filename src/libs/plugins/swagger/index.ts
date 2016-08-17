@@ -12,26 +12,32 @@ export default (): IPlugin => {
                     register: HapiSwagger,
                     options: {
                         info: {
-                            title: 'Task Api',
-                            description: 'Simple Task Api.',
-                            version: '1.0'
+	                        title      : 'MagicQuill',
+	                        description: 'API documentation to access MagicQuill REST services',
+	                        version    : '0.1'
+                        },
+                        securityDefinitions: {
+                          'jwt': {
+	                          'type': 'apiKey',
+	                          'name': 'Authorization',
+	                          'in'  : 'header'
+                          }
                         },
                         tags: [
                             {
-                                'name': 'tasks',
-                                'description': 'Api tasks interface.'
+                                'name': 'user',
+                                'description': 'API to access MagicQuill User Resources'
                             }
                         ],
                         enableDocumentation: true,
                         documentationPath: '/documentation'
                     }
                 }
-            ]
-                , (error) => {
-                    if (error) {
-                        console.log('error', error);
-                    }
-                });
+            ], (error) => {
+                if (error) {
+                    console.log('error', error);
+                }
+            });
         },
         info: () => {
             return {
