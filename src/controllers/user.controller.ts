@@ -19,19 +19,7 @@ export default class userController extends BaseController {
 		return {
 			handler: (request: Hapi.Request, reply: Hapi.IReply) => {
 				this.verifyUniqueUser(request.payload.email)
-				    .then(() => {
-				    	// Generate Hash from Password
-				    	let hash: Promise<any>;
-					    hash = this.hashPassword(request.payload.password)
-					               .then((hash) => {
-						               return hash;
-					               })
-					               .catch((error) => {
-						               reply(Boom.badRequest(error));
-					               });
-
-					    return hash;
-				    })
+				    .then(() => this.hashPassword(request.payload.password))
 				    .then((hash) => {
 				    	// Persist User in Mongo
 					    let newUser: IUser = <IUser>{};
@@ -43,17 +31,17 @@ export default class userController extends BaseController {
 					    newUser.userRole  = USERROLES.STUDENT;
 					    newUser.lastLogin = new Date();
 
-					    this.userRepository.create(newUser)
-					        .then((user) => {
-					        	reply(user).code(201);
-					        })
-					        .catch((error) => {
-					        	reply(Boom.badImplementation(error))
-					        });
+					    return this.userRepository.create(newUser)
+				    })
+				    .then((user) => this.createToken(user))
+				    .then((token) => {
+					    reply({
+						    status: STATUS.SUCCESSFUL
+						}).code(201);
 				    })
 				    .catch((error) => {
 					    console.log(error);
-				    	reply(Boom.badRequest('Could not create user. Please try again later or contact support'));
+				    	reply(Boom.badImplementation('Could not create user. Please try again later or contact support'));
 					});
 			},
 			auth: false,
@@ -78,17 +66,25 @@ export default class userController extends BaseController {
 	public authenticateUser(): Hapi.IRouteAdditionalConfigurationOptions {
 		return {
 			handler: (request: Hapi.Request, reply: Hapi.IReply) => {
+				let user: IUser;
+
 				this.verifyCredentials(request.payload.email, request.payload.password)
-					.then((user: IUser) => {
-						const token = this.createToken(user);
+					.then((userObj: IUser) => {
+						user = userObj;
+						return this.createToken(user);
+					})
+					.then((token) => {
 						let { userRole } = user;
+
 						reply({
+							status: STATUS.SUCCESSFUL,
 							token,
 							userRole
 						}).code(201);
 
 						user.lastLogin = new Date();
-						this.userRepository.findByIdAndUpdate(user._id, user);
+
+						return this.userRepository.findByIdAndUpdate(user._id, user);
 					})
 					.catch((error) => {
 						reply(Boom.badRequest(error));
@@ -153,7 +149,7 @@ export default class userController extends BaseController {
 	}
 
 	private verifyCredentials(email: string, password: string): Promise<any> {
-		const user = new Promise((resolve, reject) => {
+		return new Promise((resolve, reject) => {
 			this.userRepository.find({
 				email
 			}, 1, 0).then((user) => {
@@ -165,7 +161,7 @@ export default class userController extends BaseController {
 						}
 
 						// Maybe we can send "Incorrect Password" message,
-						// but that would make it possible to bruteforce
+						// but that would make it possible to brute-force
 						return reject('User account doesn\'t exist');
 					})
 				} else {
@@ -173,12 +169,10 @@ export default class userController extends BaseController {
 				}
 			});
 		});
-
-		return user;
 	}
 
 	private verifyUniqueUser(email: string):Promise<any> {
-		const uniqueUser = new Promise((resolve, reject) => {
+		return new Promise((resolve, reject) => {
 			this.userRepository.find({
 				email
 			}, 1, 0).then((user) => {
@@ -189,8 +183,6 @@ export default class userController extends BaseController {
 				}
 			});
 		});
-
-		return uniqueUser;
 	}
 
 	private hashPassword(password): Promise<any> {
@@ -206,16 +198,26 @@ export default class userController extends BaseController {
 					}
 
 					resolve(hash);
-				})
-			})
+				});
+			});
 		});
 	}
 
-	private createToken(user: IUser) {
+	private createToken(user: IUser): Promise<any> {
 		const { _id, email } = user;
-		return JWT.sign({
-			_id,
-			email
-		}, JWTSECRET);
+		return new Promise((resolve, reject) => {
+			JWT.sign({
+				_id,
+				email
+			}, JWTSECRET, {
+				expiresIn: 60,
+			}, (error, jwt) => {
+				if(error){
+					reject('Could not create JWT token');
+				}
+
+				resolve(jwt);
+			});
+		});
 	}
 }
