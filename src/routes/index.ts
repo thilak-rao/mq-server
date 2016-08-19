@@ -44,19 +44,19 @@ export default function(server: Hapi.Server) {
     });
 
 
-	// Signup Route
+	// User API Routes
 	const userController = new UserController(server, new UserRepository());
 
 	server.route({
 		method: 'POST',
-		path: '/api/user',
+		path: '/api/user/',
 		handler: undefined,
 		config: userController.createUser()
 	});
 
 	server.route({
 		method: 'POST',
-		path: '/api/login',
+		path: '/api/login/',
 		handler: undefined,
 		config: userController.authenticateUser()
 	});
@@ -64,9 +64,16 @@ export default function(server: Hapi.Server) {
 
 	server.route({
 		method: 'DELETE',
-		path: '/api/user',
+		path: '/api/user/',
 		handler: undefined,
 		config: userController.deleteUser()
+	});
+
+	server.route({
+		method: 'PUT',
+		path: '/api/user/',
+		handler: undefined,
+		config: userController.updateUser()
 	});
 
 

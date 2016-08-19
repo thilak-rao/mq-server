@@ -33,7 +33,7 @@ export default class userController extends BaseController {
 
 					    return this.userRepository.create(newUser)
 				    })
-				    .then((user) => this.createToken(user))
+				    .then((user: IUser) => this.createToken(user))
 				    .then((token) => {
 					    reply({
 						    status: STATUS.SUCCESSFUL
@@ -48,7 +48,7 @@ export default class userController extends BaseController {
 			validate: {
 				payload: UserModel.createUserModel
 			},
-			tags: ['api', 'user', 'signup'],
+			tags: ['api', 'user', 'create'],
 			description: 'Creates a new user account',
 			plugins: {
 				'hapi-swagger': {
@@ -73,7 +73,7 @@ export default class userController extends BaseController {
 						user = userObj;
 						return this.createToken(user);
 					})
-					.then((token) => {
+					.then((token: string) => {
 						let { userRole } = user;
 
 						reply({
@@ -148,21 +148,102 @@ export default class userController extends BaseController {
 		}
 	}
 
+	public updateUser(): Hapi.IRouteAdditionalConfigurationOptions {
+		return {
+			handler: (request: Hapi.Request, reply: Hapi.IReply) => {
+				const payload: any = request.payload;
+				const hasPwdChanged: Boolean = payload.hasOwnProperty('oldPassword') && payload.hasOwnProperty('newPassword');
+
+				let user: IUser;
+				this.getUser(request)
+				    .then((userObj: IUser) => {
+					    user = userObj;
+				    	if(hasPwdChanged){
+						    return this.verifyCredentials(user.email, payload['oldPassword']);
+					    }
+				    })
+				    .then(() => {
+				    	if(hasPwdChanged) {
+				    		return this.hashPassword(payload['newPassword']);
+					    }
+				    }).then((hash: string) => {
+				    	if(hasPwdChanged && typeof hash === 'string') {
+				    	    user.password = hash;
+						    console.log(`Password Changed | User: ${user.email}`);
+					    }
+
+						// check if any other user properties need to be changed
+						for(const key in payload) {
+							if(user.hasOwnProperty(key)) {
+								if(payload[key] !== user[key]) {
+									console.log(`Changing ${key} to ${payload[key]} | User: ${user.email}`);
+									user[key] = payload[key];
+								}
+							}
+						}
+
+						return this.userRepository.findByIdAndUpdate(user._id, user);
+					})
+					.then((user: IUser) => {
+						reply({
+							status: STATUS.SUCCESSFUL
+						}).code(201);
+					})
+					.catch((error) => {
+						console.log(`${error} | User: ${user.email}`);
+						reply(Boom.badRequest(error));
+					})
+			},
+			validate: {
+				payload: UserModel.updateUserModel
+			},
+			tags: ['api', 'user', 'update'],
+			description: 'Updates user account',
+			plugins: {
+			'hapi-swagger': {
+				responses: {
+					'201': {
+						'description': 'Updates a given MagicQuill user account',
+							'schema': UserModel.updateUserModel
+					}
+				},
+				security: [{
+					'jwt': [] //TODO: Ensure, Hapi Swagger Documents Security Definitions
+				}]
+			}
+		}
+		}
+	}
+
+	private getUser(request: Hapi.Request): Promise<any> {
+		return new Promise((resolve, reject) => {
+			let { _id } = request.auth.credentials;
+			this.userRepository.find({
+				_id
+			}, 1, 0).then((user) => {
+				if(user.length) {
+					let userObj: IUser = user[user.length - 1];
+					resolve(userObj);
+				} else {
+					return reject('Invalid User');
+				}
+			});
+		})
+	}
+
 	private verifyCredentials(email: string, password: string): Promise<any> {
 		return new Promise((resolve, reject) => {
 			this.userRepository.find({
 				email
-			}, 1, 0).then((user) => {
+			}, 1, 0).then((user: Array<IUser>) => {
 				if(user.length) {
-					let existingUser: IUser = user[user.length - 1];
-					Bcrypt.compare(password, existingUser.password, (error, isValid) => {
+					let userObj: IUser = user[user.length - 1];
+					Bcrypt.compare(password, userObj.password, (error, isValid) => {
 						if(isValid) {
-							return resolve(existingUser);
+							return resolve(userObj);
 						}
 
-						// Maybe we can send "Incorrect Password" message,
-						// but that would make it possible to brute-force
-						return reject('User account doesn\'t exist');
+						return reject('Incorrect Password');
 					})
 				} else {
 					return reject('User account doesn\'t exist');
@@ -175,7 +256,7 @@ export default class userController extends BaseController {
 		return new Promise((resolve, reject) => {
 			this.userRepository.find({
 				email
-			}, 1, 0).then((user) => {
+			}, 1, 0).then((user: Array<IUser>) => {
 				if(!user.length) {
 					return resolve();
 				} else {
@@ -204,13 +285,14 @@ export default class userController extends BaseController {
 	}
 
 	private createToken(user: IUser): Promise<any> {
-		const { _id, email } = user;
+		const { _id, email, userRole } = user;
 		return new Promise((resolve, reject) => {
 			JWT.sign({
 				_id,
-				email
+				email,
+				userRole
 			}, JWTSECRET, {
-				expiresIn: 60,
+				expiresIn: 3600, // 1 hour
 			}, (error, jwt) => {
 				if(error){
 					reject('Could not create JWT token');
