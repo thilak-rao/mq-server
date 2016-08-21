@@ -42,7 +42,7 @@ export default (): IPlugin => {
         info: () => {
             return {
                 name: "Swagger Documentation",
-                version: "1.0.0"
+                version: "6.2.2"
             };
         }
     }
