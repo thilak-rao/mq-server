@@ -280,6 +280,216 @@ lab.experiment('User API: Login Test - ', () => {
 		});
 	});
 });
+/**
+ * Update User Test
+ * Test for all adverse scenarios while updating user
+ */
+lab.experiment('User API: Update User Test - ', () => {
+
+	lab.test('valid old password, but invalid new password', (done) => {
+		const options: IServerInjectOptions = {
+			method : USER_API.UPDATE.METHOD,
+			url    : USER_API.UPDATE.URL,
+			headers: {
+				'Authorization': USR_MODEL.TOKEN
+			},
+			payload: {
+				oldPassword: USR_MODEL.PASSWORD,
+				newPassword: 'invalid'
+			}
+		};
+
+		server.inject(options, (response: IServerInjectResponse) => {
+			const result: any = response.result;
+			Code.expect(response.statusCode).to.equal(400);
+			Code.expect(result.validation.keys).to.include('newPassword');
+			done();
+		});
+	});
+
+	lab.test('invalid old password, but valid new password', (done) => {
+		const options: IServerInjectOptions = {
+			method : USER_API.UPDATE.METHOD,
+			url    : USER_API.UPDATE.URL,
+			headers: {
+				'Authorization': USR_MODEL.TOKEN
+			},
+			payload: {
+				oldPassword: 'incorrect-password',
+				newPassword: 'new-password-test'
+			}
+		};
+
+		server.inject(options, (response: IServerInjectResponse) => {
+			const result: any = response.result;
+			Code.expect(response.statusCode).to.equal(400);
+			Code.expect(result.message).to.be.equal(ERROR_MSG.INCORRECT_PWD);
+			done();
+		});
+	});
+
+	lab.test('Update without authorisation token', (done) => {
+		const options: IServerInjectOptions = {
+			method : USER_API.UPDATE.METHOD,
+			url    : USER_API.UPDATE.URL,
+			payload: {
+				oldPassword: USR_MODEL.PASSWORD,
+				newPassword: 'new-password-test',
+				firstName  : 'new first name',
+				firstLast  : 'new last name',
+				email      : 'mystery@magicquill.in'
+			}
+		};
+
+		server.inject(options, (response: IServerInjectResponse) => {
+			const result: any = response.result;
+			Code.expect(response.statusCode).to.equal(401);
+			Code.expect(result.error).to.be.equal(STATUS.UNAUTHORIZED);
+			done();
+		});
+	});
+
+	lab.test('Successfully update password!!', (done) => {
+		const options: IServerInjectOptions = {
+			method : USER_API.UPDATE.METHOD,
+			url    : USER_API.UPDATE.URL,
+			headers: {
+				'Authorization': USR_MODEL.TOKEN
+			},
+			payload: {
+				oldPassword: USR_MODEL.PASSWORD,
+				newPassword: 'new-password-test'
+			}
+		};
+
+		server.inject(options, (response: IServerInjectResponse) => {
+			const result: any = response.result;
+			Code.expect(response.statusCode).to.equal(201);
+			Code.expect(result.status).to.be.equal(STATUS.SUCCESSFUL);
+			done();
+		});
+	});
+
+	lab.test('Successfully update password again!!', (done) => {
+		const options: IServerInjectOptions = {
+			method : USER_API.UPDATE.METHOD,
+			url    : USER_API.UPDATE.URL,
+			headers: {
+				'Authorization': USR_MODEL.TOKEN
+			},
+			payload: {
+				oldPassword: 'new-password-test',
+				newPassword: USR_MODEL.PASSWORD
+			}
+		};
+
+		server.inject(options, (response: IServerInjectResponse) => {
+			const result: any = response.result;
+			Code.expect(response.statusCode).to.equal(201);
+			Code.expect(result.status).to.be.equal(STATUS.SUCCESSFUL);
+			done();
+		});
+	});
+
+	lab.test('Update firstName only', (done) => {
+		const options: IServerInjectOptions = {
+			method : USER_API.UPDATE.METHOD,
+			url    : USER_API.UPDATE.URL,
+			headers: {
+				'Authorization': USR_MODEL.TOKEN
+			},
+			payload: {
+				firstName: 'Jane'
+			}
+		};
+
+		server.inject(options, (response: IServerInjectResponse) => {
+			const result: any = response.result;
+			Code.expect(response.statusCode).to.equal(201);
+			Code.expect(result.status).to.be.equal(STATUS.SUCCESSFUL);
+			done();
+		});
+	});
+	lab.test('Update lastName only', (done) => {
+		const options: IServerInjectOptions = {
+			method : USER_API.UPDATE.METHOD,
+			url    : USER_API.UPDATE.URL,
+			headers: {
+				'Authorization': USR_MODEL.TOKEN
+			},
+			payload: {
+				lastName: 'Smith'
+			}
+		};
+
+		server.inject(options, (response: IServerInjectResponse) => {
+			const result: any = response.result;
+			Code.expect(response.statusCode).to.equal(201);
+			Code.expect(result.status).to.be.equal(STATUS.SUCCESSFUL);
+			done();
+		});
+	});
+
+	lab.test('Update with invalid email', (done) => {
+		const options: IServerInjectOptions = {
+			method : USER_API.UPDATE.METHOD,
+			url    : USER_API.UPDATE.URL,
+			headers: {
+				'Authorization': USR_MODEL.TOKEN
+			},
+			payload: {
+				email: 'invalid-email'
+			}
+		};
+
+		server.inject(options, (response: IServerInjectResponse) => {
+			const result: any = response.result;
+			Code.expect(response.statusCode).to.equal(400);
+			Code.expect(result.validation.keys).to.include('email');
+			done();
+		});
+	});
+
+	lab.test('Update email only', (done) => {
+		const options: IServerInjectOptions = {
+			method : USER_API.UPDATE.METHOD,
+			url    : USER_API.UPDATE.URL,
+			headers: {
+				'Authorization': USR_MODEL.TOKEN
+			},
+			payload: {
+				email: 'mystery@magicquill.in'
+			}
+		};
+
+		server.inject(options, (response: IServerInjectResponse) => {
+			const result: any = response.result;
+			Code.expect(response.statusCode).to.equal(201);
+			Code.expect(result.status).to.be.equal(STATUS.SUCCESSFUL);
+			done();
+		});
+	});
+
+	lab.test('Update email again!!', (done) => {
+		const options: IServerInjectOptions = {
+			method : USER_API.UPDATE.METHOD,
+			url    : USER_API.UPDATE.URL,
+			headers: {
+				'Authorization': USR_MODEL.TOKEN
+			},
+			payload: {
+				email: USR_MODEL.EMAIL
+			}
+		};
+
+		server.inject(options, (response: IServerInjectResponse) => {
+			const result: any = response.result;
+			Code.expect(response.statusCode).to.equal(201);
+			Code.expect(result.status).to.be.equal(STATUS.SUCCESSFUL);
+			done();
+		});
+	});
+});
 
 /**
  * Delete User Test

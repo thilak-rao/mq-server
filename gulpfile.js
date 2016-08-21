@@ -84,7 +84,7 @@ gulp.task('build', ['copy-public'], () => {
 
 gulp.task('test', ['build'], () => {
     return gulp.src(['build/test/**/*.js'], { read: false })
-        .pipe(lab())
+        .pipe(lab(['-v', '-C']))
         .once('error', () => {
             process.exit(1);
         })
