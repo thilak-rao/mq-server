@@ -1,7 +1,7 @@
 {
-  "name": "new-folder",
-  "version": "1.0.0",
-  "description": "",
+  "name": "magicquill",
+  "version": "0.1.0",
+  "description": "MagicQuill - Learning Management",
   "license": "MIT",
   "repository": {
     "url": "https://github.com/Talento90/typescript-node.git"
@@ -31,6 +31,7 @@
     "inert": "4.0.1",
     "joi": "9.0.4",
     "jsonwebtoken": "7.1.9",
+    "lodash": "^4.15.0",
     "moment": "2.14.1",
     "mongodb": "2.2.5",
     "node-uuid": "1.4.7",
@@ -38,7 +39,7 @@
     "vision": "4.1.0"
   },
   "devDependencies": {
-    "chai": "3.5.0",
+    "code": "3.0.2",
     "gulp": "3.9.1",
     "gulp-help": "1.6.1",
     "gulp-istanbul": "1.0.0",
@@ -48,6 +49,7 @@
     "gulp-sourcemaps": "1.6.0",
     "gulp-tslint": "6.0.2",
     "gulp-typescript": "2.13.6",
+    "lab": "11.0.0",
     "tslint": "3.14.0",
     "typescript": "1.8.10"
   }

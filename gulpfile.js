@@ -62,6 +62,10 @@ gulp.task('compile', ['clean'], () => {
 gulp.task('watch', function() {
     gulp.watch([sourceFiles], ['compile']).on('change', (e) => {
         console.log('TypeScript file ' + e.path + ' has been changed. Compiling.')
+    });
+
+    gulp.watch([testFiles], ['compile']).on('change', (e) => {
+        console.log('TypeScript test file ' + e.path + ' has been changed. Compiling.')
     })
 
     gulp.watch([publicFiles], ['copy-public']).on('change', (e) => {
