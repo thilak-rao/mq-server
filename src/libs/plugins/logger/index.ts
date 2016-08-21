@@ -1,36 +1,41 @@
 import {IPlugin} from '../interfaces'
-import * as Hapi from 'hapi'
-const Good = require('good');
-const GoodConsole = require('good-console');
+import * as Hapi from 'hapi';
+import {ISDEBUG} from "../../../configs/CONSTANTS";
+const Good = require('good')
 
 export default (): IPlugin => {
     return {
         register: (server: Hapi.Server) => {
-            const opts = {
-                ops: {
-                    interval: 1000,
-                },
-                reporters: {
-                    consoleReporter: [{
-                        module: 'good-squeeze',
-                        name: 'Squeeze',
-                        args: [{ log: '*', response: '*', 'error': '*', request: '*' }]
-                    }, {
-                        module: 'good-console'
-                    }, 'stdout'],
-                    fileReporter: [{
-                        module: 'good-squeeze',
-                        name: 'Squeeze',
-                        args: [{ log: '*', response: '*', 'error': '*', request: '*' }]
-                    }, {
-                        module: 'good-squeeze',
-                        name: 'SafeJson'
-                    }, {
-                        module: 'good-file',
-                        args: ['./log/server.log']
-                    }]
-                }
-            };
+	        const fileReporter = [{
+		        module: 'good-squeeze',
+		        name  : 'Squeeze',
+		        args  : [{log: '*', response: '*', 'error': '*', request: '*'}]
+	        }, {
+		        module: 'good-squeeze',
+		        name  : 'SafeJson'
+	        }, {
+		        module: 'good-file',
+		        args  : ['./log/server.log']
+	        }]
+
+	        const consoleReporter = [{
+		        module: 'good-squeeze',
+		        name  : 'Squeeze',
+		        args  : [{log: '*', response: '*', 'error': '*', request: '*'}]
+	        }, {
+		        module: 'good-console'
+	        }, 'stdout'];
+
+	        let opts = {
+		        ops: { interval: 1000 },
+		        reporters: null
+	        };
+
+        	if(ISDEBUG){
+		        opts.reporters = { consoleReporter };
+	        } else {
+		        opts.reporters = { fileReporter };
+	        }
 
             server.register({
                 register: Good,

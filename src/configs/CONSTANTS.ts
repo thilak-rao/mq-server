@@ -1,3 +1,5 @@
+export const ISDEBUG :boolean = false;
+
 export const JWTSECRET :string = 'secretkey';
 
 export const USER_API = {
@@ -26,7 +28,8 @@ export const USERROLES = {
 };
 
 export const STATUS = {
-	SUCCESSFUL : 'successful',
+	SUCCESSFUL : 'Successful',
+	UNAUTHORIZED: 'Unauthorized'
 };
 
 export const ERROR_MSG = {

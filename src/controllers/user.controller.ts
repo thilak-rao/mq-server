@@ -40,7 +40,7 @@ export default class userController extends BaseController {
 						}).code(201);
 				    })
 				    .catch((error) => {
-					    console.error(`${error} | Payload: ${JSON.stringify(request.payload)}`);
+					    console.log(`${error} | Payload: ${JSON.stringify(request.payload)}`);
 				    	reply(Boom.badRequest(error));
 					});
 			},
@@ -87,7 +87,7 @@ export default class userController extends BaseController {
 						return this.userRepository.findByIdAndUpdate(user._id, user);
 					})
 					.catch((error) => {
-						console.error(`${error} | Payload: ${JSON.stringify(request.payload)}`);
+						console.log(`${error} | Payload: ${JSON.stringify(request.payload)}`);
 						reply(Boom.badRequest(error));
 					});
 			},
@@ -122,13 +122,13 @@ export default class userController extends BaseController {
 						        }).code(201);
 					        })
 					        .catch((error) => {
-						        console.error(`${error} | Payload: ${JSON.stringify(request.payload)}`);
-					        	reply(Boom.badImplementation(error));
+						        console.log(`${error} | Payload: ${JSON.stringify(request.payload)}`);
+					        	reply(Boom.badRequest(error));
 					        });
 				    })
 				    .catch((error) => {
 					    console.log(`${error} | Payload: ${JSON.stringify(request.payload)}`);
-					    reply(Boom.badData(error));
+					    reply(Boom.badRequest(error));
 				    });
 			},
 			validate: {
@@ -194,7 +194,7 @@ export default class userController extends BaseController {
 						}).code(201);
 					})
 					.catch((error) => {
-						console.error(`${error} | Payload: ${JSON.stringify(request.payload)}`);
+						console.log(`${error} | Payload: ${JSON.stringify(request.payload)}`);
 						reply(Boom.badRequest(error));
 					})
 			},

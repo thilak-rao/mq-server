@@ -286,6 +286,68 @@ lab.experiment('User API: Login Test - ', () => {
  * Test for all adverse scenarios while deleting user
  */
 lab.experiment('User API: Delete User Test - ', () => {
+
+	lab.test("Delete user without auth token", (done) => {
+		const options: IServerInjectOptions = {
+			method : USER_API.DELETE.METHOD,
+			url    : USER_API.DELETE.URL,
+			payload: {
+				email    : USR_MODEL.EMAIL,
+				password : USR_MODEL.PASSWORD
+			}
+		};
+
+		server.inject(options, (response: IServerInjectResponse) => {
+			const result: any = response.result;
+
+			Code.expect(response.statusCode).to.equal(401);
+			Code.expect(result.error).to.equal(STATUS.UNAUTHORIZED);
+			done();
+		});
+	});
+
+	lab.test("Delete user with wrong password", (done) => {
+		const options: IServerInjectOptions = {
+			method : USER_API.DELETE.METHOD,
+			url    : USER_API.DELETE.URL,
+			headers: {
+				'Authorization': USR_MODEL.TOKEN
+			},
+			payload: {
+				email    : USR_MODEL.EMAIL,
+				password : 'invalid-password'
+			}
+		};
+
+		server.inject(options, (response: IServerInjectResponse) => {
+			const result: any = response.result;
+			Code.expect(response.statusCode).to.equal(400);
+			Code.expect(result.message).to.equal(ERROR_MSG.INCORRECT_PWD);
+			done();
+		});
+	});
+
+	lab.test("Delete user with incorrect email address", (done) => {
+		const options: IServerInjectOptions = {
+			method : USER_API.DELETE.METHOD,
+			url    : USER_API.DELETE.URL,
+			headers: {
+				'Authorization': USR_MODEL.TOKEN
+			},
+			payload: {
+				email    : 'mystery@magicquill.in',
+				password : USR_MODEL.PASSWORD
+			}
+		};
+
+		server.inject(options, (response: IServerInjectResponse) => {
+			const result: any = response.result;
+			Code.expect(response.statusCode).to.equal(400);
+			Code.expect(result.message).to.equal(ERROR_MSG.USR_DOESNT_EXIST);
+			done();
+		});
+	});
+
 	lab.test("Successfully delete a user", (done) => {
 		const options: IServerInjectOptions = {
 			method : USER_API.DELETE.METHOD,
@@ -301,7 +363,6 @@ lab.experiment('User API: Delete User Test - ', () => {
 
 		server.inject(options, (response: IServerInjectResponse) => {
 			const result: any = response.result;
-			USR_MODEL.TOKEN = result.token;
 
 			Code.expect(response.statusCode).to.equal(201);
 			Code.expect(result.status).to.equal(STATUS.SUCCESSFUL);
