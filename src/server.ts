@@ -2,14 +2,14 @@
 import {IPlugin} from "./libs/plugins/interfaces";
 import Configurations from "./configs/configurations";
 import * as Hapi from "hapi";
+import {Server} from "hapi";
 import Routes from "./routes";
 
+const server: Server = new Hapi.Server();
 
-const fs        = require('fs'),
-      Path      = require('path');
-
-var port   = process.env.port || Configurations.Server.port;
-var server = new Hapi.Server();
+const port = process.env.port || Configurations.Server.port,
+      fs   = require('fs'),
+      Path = require('path');
 
 server.connection({
 	port: port,

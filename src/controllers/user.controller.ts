@@ -4,7 +4,7 @@ import * as Bcrypt from "bcrypt";
 import * as JWT from "jsonwebtoken";
 import BaseController from './baseController';
 import * as UserModel from '../models/user.model';
-import { USERROLES, JWTSECRET, STATUS } from '../configs/CONSTANTS'
+import {USERROLES, JWTSECRET, STATUS, ERROR_MSG} from '../configs/CONSTANTS'
 import { IUser, IUserRepository } from '../libs/repository/interfaces'
 
 export default class userController extends BaseController {
@@ -40,8 +40,8 @@ export default class userController extends BaseController {
 						}).code(201);
 				    })
 				    .catch((error) => {
-					    console.log(error);
-				    	reply(Boom.badImplementation('Could not create user. Please try again later or contact support'));
+					    console.error(`${error} | Payload: ${JSON.stringify(request.payload)}`);
+				    	reply(Boom.badRequest(error));
 					});
 			},
 			auth: false,
@@ -87,6 +87,7 @@ export default class userController extends BaseController {
 						return this.userRepository.findByIdAndUpdate(user._id, user);
 					})
 					.catch((error) => {
+						console.error(`${error} | Payload: ${JSON.stringify(request.payload)}`);
 						reply(Boom.badRequest(error));
 					});
 			},
@@ -120,11 +121,14 @@ export default class userController extends BaseController {
 						        	status: STATUS.SUCCESSFUL
 						        }).code(201);
 					        })
-					        .catch(error => reply(Boom.badImplementation(error)));
+					        .catch((error) => {
+						        console.error(`${error} | Payload: ${JSON.stringify(request.payload)}`);
+					        	reply(Boom.badImplementation(error));
+					        });
 				    })
 				    .catch((error) => {
-				    	console.log(error);
-					    reply(Boom.badData('Incorrect Password'));
+					    console.log(`${error} | Payload: ${JSON.stringify(request.payload)}`);
+					    reply(Boom.badData(error));
 				    });
 			},
 			validate: {
@@ -169,14 +173,14 @@ export default class userController extends BaseController {
 				    }).then((hash: string) => {
 				    	if(hasPwdChanged && typeof hash === 'string') {
 				    	    user.password = hash;
-						    console.log(`Password Changed | User: ${user.email}`);
+						    console.log(`Password Changed for user ${user.email}`);
 					    }
 
 						// check if any other user properties need to be changed
 						for(const key in payload) {
 							if(user.hasOwnProperty(key)) {
 								if(payload[key] !== user[key]) {
-									console.log(`Changing ${key} to ${payload[key]} | User: ${user.email}`);
+									console.log(`Changing ${key} for user ${user.email}`);
 									user[key] = payload[key];
 								}
 							}
@@ -190,7 +194,7 @@ export default class userController extends BaseController {
 						}).code(201);
 					})
 					.catch((error) => {
-						console.log(`${error} | User: ${user.email}`);
+						console.error(`${error} | Payload: ${JSON.stringify(request.payload)}`);
 						reply(Boom.badRequest(error));
 					})
 			},
@@ -225,7 +229,7 @@ export default class userController extends BaseController {
 					let userObj: IUser = user[user.length - 1];
 					resolve(userObj);
 				} else {
-					return reject('Invalid User');
+					return reject(ERROR_MSG.USR_DOESNT_EXIST);
 				}
 			});
 		})
@@ -243,10 +247,10 @@ export default class userController extends BaseController {
 							return resolve(userObj);
 						}
 
-						return reject('Incorrect Password');
+						return reject(ERROR_MSG.INCORRECT_PWD);
 					})
 				} else {
-					return reject('User account doesn\'t exist');
+					return reject(ERROR_MSG.USR_DOESNT_EXIST);
 				}
 			});
 		});
@@ -260,7 +264,7 @@ export default class userController extends BaseController {
 				if(!user.length) {
 					return resolve();
 				} else {
-					return reject('User already exists');
+					return reject(ERROR_MSG.USR_ALREADY_EXIST);
 				}
 			});
 		});
@@ -295,7 +299,7 @@ export default class userController extends BaseController {
 				expiresIn: 3600, // 1 hour
 			}, (error, jwt) => {
 				if(error){
-					reject('Could not create JWT token');
+					reject('Could not create token');
 				}
 
 				resolve(jwt);

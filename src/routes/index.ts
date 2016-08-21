@@ -3,6 +3,7 @@ import TaskController from '../controllers/taskController';
 import UserController from '../controllers/user.controller';
 import TaskRepository from '../libs/repository/mongo/taskRepository';
 import UserRepository from '../libs/repository/mongo/userRepository';
+import {USER_API} from "../configs/CONSTANTS";
 
 export default function(server: Hapi.Server) {
 
@@ -48,30 +49,30 @@ export default function(server: Hapi.Server) {
 	const userController = new UserController(server, new UserRepository());
 
 	server.route({
-		method: 'POST',
-		path: '/api/user/',
+		method: USER_API.CREATE.METHOD,
+		path: USER_API.CREATE.URL,
 		handler: undefined,
 		config: userController.createUser()
 	});
 
 	server.route({
-		method: 'POST',
-		path: '/api/login/',
+		method: USER_API.LOGIN.METHOD,
+		path: USER_API.LOGIN.URL,
 		handler: undefined,
 		config: userController.authenticateUser()
 	});
 
 
 	server.route({
-		method: 'DELETE',
-		path: '/api/user/',
+		method: USER_API.DELETE.METHOD,
+		path: USER_API.DELETE.URL,
 		handler: undefined,
 		config: userController.deleteUser()
 	});
 
 	server.route({
-		method: 'PUT',
-		path: '/api/user/',
+		method: USER_API.UPDATE.METHOD,
+		path: USER_API.UPDATE.URL,
 		handler: undefined,
 		config: userController.updateUser()
 	});

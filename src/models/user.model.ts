@@ -18,9 +18,9 @@ export const deleteUserModel = Joi.object().keys({
 });
 
 export const updateUserModel = Joi.object().keys({
-	firstName: Joi.string(),
-	lastName : Joi.string(),
-	email    : Joi.string().email(),
-	newPassword : Joi.string().regex(/.{8,30}$/),
-	oldPassword : Joi.string().regex(/.{8,30}$/)
+	firstName  : Joi.string(),
+	lastName   : Joi.string(),
+	email      : Joi.string().email(),
+	newPassword: Joi.string().regex(/.{8,30}$/),
+	oldPassword: Joi.string().regex(/.{8,30}$/)
 });
