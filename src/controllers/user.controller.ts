@@ -4,6 +4,7 @@ import * as Bcrypt from "bcrypt";
 import * as JWT from "jsonwebtoken";
 import BaseController from './baseController';
 import * as UserModel from '../models/user.model';
+import * as ErrorModel from '../models/error.model';
 import {USERROLES, JWTSECRET, STATUS, ERROR_MSG} from '../configs/CONSTANTS'
 import { IUser, IUserRepository } from '../libs/repository/interfaces'
 
@@ -56,6 +57,10 @@ export default class userController extends BaseController {
 						'201': {
 							'description': 'Creates a new user account',
 							'schema': UserModel.createUserModel
+						},
+						'400': {
+							'description': 'Could not create user',
+							'schema': ErrorModel.badRequest
 						}
 					}
 				}
@@ -103,6 +108,10 @@ export default class userController extends BaseController {
 						'201': {
 							'description': 'Logs users to access MagicQuill resources, and returns a JSON Web Token',
 							'schema': UserModel.authenticationModel
+						},
+						'400': {
+							'description': 'Could not login user',
+							'schema': ErrorModel.badRequest
 						}
 					}
 				}
@@ -142,6 +151,10 @@ export default class userController extends BaseController {
 						'201': {
 							'description': 'Deletes a given MagicQuill user account',
 							'schema': UserModel.deleteUserModel
+						},
+						'400': {
+							'description': 'Could not delete user',
+							'schema': ErrorModel.badRequest
 						}
 					},
 					security: [{
@@ -209,6 +222,10 @@ export default class userController extends BaseController {
 					'201': {
 						'description': 'Updates a given MagicQuill user account',
 							'schema': UserModel.updateUserModel
+					},
+					'400': {
+						'description': 'Could not update user',
+						'schema': ErrorModel.badRequest
 					}
 				},
 				security: [{
