@@ -1,7 +1,3 @@
-export const ISDEBUG :boolean = false;
-
-export const JWTSECRET :string = 'secretkey';
-
 export const USER_API = {
 	CREATE: {
 		URL   : '/api/user/',
@@ -33,7 +29,7 @@ export const STATUS = {
 };
 
 export const ERROR_MSG = {
-	USR_DOESNT_EXIST: 'User account doesn\'t exist',
-	INCORRECT_PWD: 'Incorrect Password',
-	USR_ALREADY_EXIST: 'User already exists',
-}
+	USR_DOESNT_EXIST : 'User account doesn\'t exist',
+	INCORRECT_PWD    : 'Incorrect Password',
+	USR_ALREADY_EXIST: 'User already exists'
+};

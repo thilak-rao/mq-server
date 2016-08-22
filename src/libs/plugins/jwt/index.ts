@@ -1,7 +1,7 @@
 import {IPlugin} from '../interfaces';
 import * as Hapi from 'hapi';
 const authJWT2 = require('hapi-auth-jwt2');
-import {JWTSECRET} from "../../../configs/CONSTANTS";
+import {JWTSECRET} from "../../../configs/environment";
 
 export default (): IPlugin => {
 	return {
@@ -36,5 +36,5 @@ export default (): IPlugin => {
 				version: "7.0.1"
 			};
 		}
-	}
+	};
 };

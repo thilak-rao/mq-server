@@ -1,5 +1,5 @@
-import {IPlugin, IPluginInfo} from '../interfaces'
-import * as Hapi from 'hapi'
+import {IPlugin, IPluginInfo} from '../interfaces';
+import * as Hapi from 'hapi';
 const Vision = require('vision');
 const HapiSwagger = require('hapi-swagger');
 
@@ -45,5 +45,5 @@ export default (): IPlugin => {
                 version: "6.2.2"
             };
         }
-    }
+    };
 };

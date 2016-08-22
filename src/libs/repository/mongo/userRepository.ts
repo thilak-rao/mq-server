@@ -1,5 +1,5 @@
-import {IUser} from "../interfaces"
-import MongoRepository from "./mongoRepository"
+import {IUser} from "../interfaces";
+import MongoRepository from "./mongoRepository";
 
 class UserRepository extends MongoRepository<IUser>  {
 	constructor() {

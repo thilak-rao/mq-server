@@ -1,7 +1,7 @@
-import {IPlugin} from '../interfaces'
+import {IPlugin} from '../interfaces';
 import * as Hapi from 'hapi';
-import {ISDEBUG} from "../../../configs/CONSTANTS";
-const Good = require('good')
+import {ISDEBUG} from "../../../configs/environment";
+const Good = require('good');
 
 export default (): IPlugin => {
     return {
@@ -16,7 +16,7 @@ export default (): IPlugin => {
 	        }, {
 		        module: 'good-file',
 		        args  : ['./log/server.log']
-	        }]
+	        }];
 
 	        const consoleReporter = [{
 		        module: 'good-squeeze',
@@ -31,10 +31,10 @@ export default (): IPlugin => {
 		        reporters: null
 	        };
 
-        	if(ISDEBUG){
-		        opts.reporters = { consoleReporter };
+	        if (ISDEBUG) {
+		        opts.reporters = {consoleReporter};
 	        } else {
-		        opts.reporters = { fileReporter };
+		        opts.reporters = {fileReporter};
 	        }
 
             server.register({
@@ -52,5 +52,5 @@ export default (): IPlugin => {
                 version: "7.0.1"
             };
         }
-    }
+    };
 };

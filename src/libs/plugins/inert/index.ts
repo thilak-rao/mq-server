@@ -24,5 +24,5 @@ export default (): IPlugin => {
 				version: "4.0.1"
 			};
 		}
-	}
+	};
 };

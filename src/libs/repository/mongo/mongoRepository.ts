@@ -1,5 +1,5 @@
-import * as MongoDb from 'mongodb'
-import {IEntity, IRepository} from "../interfaces"
+import * as MongoDb from 'mongodb';
+import {IEntity, IRepository} from "../interfaces";
 const UUID = require("node-uuid");
 import Configurations from "../../../configs/configurations";
 
@@ -28,7 +28,7 @@ abstract class MongoRepository<T extends IEntity> implements IRepository<IEntity
     }
 
     public findByIdAndDelete(id: string): Promise<any> {
-        return this.collection.then((collection: MongoDb.Collection) => {            
+        return this.collection.then((collection: MongoDb.Collection) => {
             return collection.deleteOne({ _id: id }).then((result) => {
                 return result;
             });
