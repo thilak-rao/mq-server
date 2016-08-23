@@ -1,6 +1,6 @@
 import * as Hapi from "hapi";
 import UserController from '../controllers/user.controller';
-import UserRepository from '../libs/repository/mongo/userRepository';
+import UserRepository from '../libs/repository/neo4j/userRepository';
 import {USER_API} from "../configs/constants";
 
 export default function(server: Hapi.Server) {

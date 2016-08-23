@@ -1,27 +1,28 @@
 import * as Hapi from "hapi";
 import * as Boom from "boom";
 import * as Bcrypt from "bcrypt";
-import * as JWT from "jsonwebtoken";
+import {IUtils} from "../configs/interfaces";
+import Utilties from "../libs/utils/utilities";
 import BaseController from './baseController';
 import * as UserModel from '../models/user.model';
 import * as ErrorModel from '../models/error.model';
 import {USERROLES, STATUS, ERROR_MSG} from '../configs/constants';
-import {JWTSECRET} from '../configs/environment';
 import { IUser, IUserRepository } from '../libs/repository/interfaces';
 
 export default class UserController extends BaseController {
 	private userRepository: IUserRepository;
-
+	private utils: IUtils;
 	constructor(server: Hapi.Server, userRepository: IUserRepository) {
 		super(server);
 		this.userRepository = userRepository;
+		this.utils = new Utilties();
 	}
 
 	public createUser(): Hapi.IRouteAdditionalConfigurationOptions {
 		return {
 			handler: (request: Hapi.Request, reply: Hapi.IReply) => {
 				this.verifyUniqueUser(request.payload.email)
-				    .then(() => this.hashPassword(request.payload.password))
+				    .then(() => this.utils.hashPassword(request.payload.password))
 				    .then((hash) => {
 				    	// Persist User in Mongo
 					    let newUser: IUser = <IUser>{};
@@ -33,9 +34,10 @@ export default class UserController extends BaseController {
 					    newUser.userRole  = USERROLES.STUDENT;
 					    newUser.lastLogin = new Date();
 
+
 					    return this.userRepository.create(newUser);
 				    })
-				    .then((user: IUser) => this.createToken(user))
+				    .then((user: IUser) => this.utils.createToken(user))
 				    .then(() => {
 					    reply({
 						    status: STATUS.SUCCESSFUL
@@ -77,7 +79,7 @@ export default class UserController extends BaseController {
 				this.verifyCredentials(request.payload.email, request.payload.password)
 					.then((userObj: IUser) => {
 						user = userObj;
-						return this.createToken(user);
+						return this.utils.createToken(user);
 					})
 					.then((token: string) => {
 						let { userRole } = user;
@@ -182,7 +184,7 @@ export default class UserController extends BaseController {
 				    })
 				    .then(() => {
 					    if (hasPwdChanged) {
-						    return this.hashPassword(payload['newPassword']);
+						    return this.utils.hashPassword(payload['newPassword']);
 					    }
 				    }).then((hash: string) => {
 						if (hasPwdChanged && typeof hash === 'string') {
@@ -284,43 +286,6 @@ export default class UserController extends BaseController {
 				} else {
 					return reject(ERROR_MSG.USR_ALREADY_EXIST);
 				}
-			});
-		});
-	}
-
-	private hashPassword(password): Promise<any> {
-		return new Promise((resolve, reject) => {
-			Bcrypt.genSalt(10, (error, salt) => {
-				if (error) {
-					reject('Error generating password salt');
-				}
-
-				Bcrypt.hash(password, salt, (error, hash) => {
-					if (error) {
-						reject('Error hashing password');
-					}
-
-					resolve(hash);
-				});
-			});
-		});
-	}
-
-	private createToken(user: IUser): Promise<any> {
-		const { _id, email, userRole } = user;
-		return new Promise((resolve, reject) => {
-			JWT.sign({
-				_id,
-				email,
-				userRole
-			}, JWTSECRET, {
-				expiresIn: 3600, // 1 hour
-			}, (error, jwt) => {
-				if (error) {
-					reject('Could not create token');
-				}
-
-				resolve(jwt);
 			});
 		});
 	}

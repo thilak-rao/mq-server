@@ -2,6 +2,7 @@
 import {IServerInjectResponse, IServerInjectOptions} from "hapi";
 import server from "../src/server";
 import {STATUS, USER_API, USERROLES, ERROR_MSG} from "../src/configs/constants";
+import UserRepository from "../src/libs/repository/neo4j/userRepository";
 
 const Code = require('code'),
       Lab  = require('lab'),
@@ -19,7 +20,18 @@ const USR_MODEL = {
 	TOKEN    : ''
 };
 
-
+lab.experiment("User Repository Repository Test", () => {
+	const userRepo = new UserRepository();
+	const password
+	lab.test("Test create method", (done) => {
+		userRepo.create({
+			email: USR_MODEL.EMAIL,
+			firstName: USR_MODEL.FIRSTNAME,
+			lastName: USR_MODEL.LASTNAME,
+			password
+		})
+	});
+});
 /**
  * Create User Test
  * Test for all adverse scenarios while creating a new user
