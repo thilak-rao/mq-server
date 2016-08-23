@@ -1,14 +1,12 @@
 import {IUser} from "../interfaces";
-import MongoRepository from "./mongoRepository";
+import Neo4jRepository from "./neo4jRepository";
 
-class UserRepository extends MongoRepository<IUser>  {
+class UserRepository extends Neo4jRepository<IUser>  {
 	constructor() {
 		super();
 	}
 
-	protected getCollectionName(): string {
-		return "users";
-	}
+	protected nodeName: string = 'User';
 }
 
 

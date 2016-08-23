@@ -5,7 +5,7 @@ import * as JWT from "jsonwebtoken";
 import BaseController from './baseController';
 import * as UserModel from '../models/user.model';
 import * as ErrorModel from '../models/error.model';
-import {USERROLES, STATUS, ERROR_MSG} from '../configs/CONSTANTS';
+import {USERROLES, STATUS, ERROR_MSG} from '../configs/constants';
 import {JWTSECRET} from '../configs/environment';
 import { IUser, IUserRepository } from '../libs/repository/interfaces';
 

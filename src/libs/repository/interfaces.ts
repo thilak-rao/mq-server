@@ -10,7 +10,14 @@ export interface IRepository<T extends IEntity> {
     findByIdAndUpdate(id: string, entity: T): Promise<T>;
     find(filter: Object, top?: number, skip?: number): Promise<Array<T>>;
     create(entity: T): Promise<T>;
-};
+}
+
+export interface INeo4j {
+	cypher(options: {
+		query: string;
+		params?: {};
+	}, callback: Function);
+}
 
 export interface IUser extends IEntity {
     firstName: string;

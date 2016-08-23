@@ -29,7 +29,7 @@
     "jsonwebtoken": "7.1.9",
     "lodash": "4.15.0",
     "moment": "2.14.1",
-    "mongodb": "2.2.5",
+    "neo4j": "2.0.0-RC2",
     "node-uuid": "1.4.7",
     "path": "0.12.7",
     "vision": "4.1.0"

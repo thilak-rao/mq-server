@@ -1,7 +1,7 @@
 /// <reference path="../typings/index.d.ts" />
 import {IServerInjectResponse, IServerInjectOptions} from "hapi";
 import server from "../src/server";
-import {STATUS, USER_API, USERROLES, ERROR_MSG} from "../src/configs/CONSTANTS";
+import {STATUS, USER_API, USERROLES, ERROR_MSG} from "../src/configs/constants";
 
 const Code = require('code'),
       Lab  = require('lab'),

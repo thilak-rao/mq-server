@@ -1,5 +1,9 @@
 export interface IRepositoryConfig {
-    connectionString: string;
+    username: string;
+    password: string;
+    host: string;
+    port: number;
+    protocol: string;
 }
 
 export interface IServerConfig {

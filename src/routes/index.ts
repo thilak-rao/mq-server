@@ -1,7 +1,7 @@
 import * as Hapi from "hapi";
 import UserController from '../controllers/user.controller';
 import UserRepository from '../libs/repository/mongo/userRepository';
-import {USER_API} from "../configs/CONSTANTS";
+import {USER_API} from "../configs/constants";
 
 export default function(server: Hapi.Server) {
 	// User API Routes
