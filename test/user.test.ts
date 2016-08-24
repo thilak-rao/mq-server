@@ -1,17 +1,22 @@
 /// <reference path="../typings/index.d.ts" />
-import {IServerInjectResponse, IServerInjectOptions} from "hapi";
 import server from "../src/server";
-import {STATUS, USER_API, USERROLES, ERROR_MSG} from "../src/configs/CONSTANTS";
+import Utilties from "../src/libs/utils/utilities";
+import {IServerInjectResponse, IServerInjectOptions} from "hapi";
+import UserRepository from "../src/libs/repository/neo4j/userRepository";
+import {STATUS, USER_API, USERROLES, ERROR_MSG} from "../src/configs/constants";
+import {IEntity, IUser} from "../src/libs/repository/interfaces";
 
-const Code = require('code'),
-      Lab  = require('lab'),
-      lab  = exports.lab = Lab.script();
-
+const Code   = require('code'),
+      UUID   = require("node-uuid"),
+      moment = require('moment'),
+      Lab    = require('lab'),
+      utils  = new Utilties(),
+      lab    = exports.lab = Lab.script();
 
 /**
  * Variables required to test user api
  */
-const USR_MODEL = {
+const USER_MODEL = {
 	EMAIL    : 'test@magicquill.in',
 	FIRSTNAME: 'John',
 	LASTNAME : 'Doe',
@@ -19,21 +24,122 @@ const USR_MODEL = {
 	TOKEN    : ''
 };
 
+const USER_REPO: IUser = {
+	_id        : UUID.v4(),
+	email      : USER_MODEL.EMAIL,
+	firstName  : USER_MODEL.FIRSTNAME,
+	lastName   : USER_MODEL.LASTNAME,
+	password   : USER_MODEL.PASSWORD,
+	createdDate: moment().toJSON(),
+	updatedAt  : moment().toJSON(),
+	isActive   : true,
+	lastLogin  : moment().toJSON(),
+	userRole   : USERROLES.STUDENT
+};
+
+lab.experiment("***** User Repository *****", () => {
+	const userRepo = new UserRepository();
+
+	const verifyUserData = (result: any, done: Function) => {
+		Code.expect(result).to.have.length(1);
+		const data: IUser = result[0];
+
+		for (const key in USER_REPO) {
+			const hasAllProps = USER_REPO.hasOwnProperty(key) && data.hasOwnProperty(key);
+			Code.expect(hasAllProps).to.be.true();
+
+			if (hasAllProps) {
+				Code.expect(data[key]).to.equal(USER_REPO[key]);
+			}
+		}
+		done();
+	};
+
+	lab.test("Test create method", (done) => {
+		utils.hashPassword(USER_MODEL.PASSWORD)
+		     .then((hash) => {
+			     Code.expect(hash).to.have.length(60);
+			     USER_REPO.password = hash;
+			     return userRepo.create(USER_REPO);
+		     })
+		     .then((result) => {
+			     verifyUserData(result, done)
+		     })
+		     .catch((error) => {
+			     console.error(error);
+			     Code.expect(error).to.be.undefined();
+			     done();
+		     });
+	});
+
+	lab.test("Test find method", (done) => {
+		const {email} = USER_REPO;
+		userRepo.find({email}, 1, 0)
+		        .then((result) => {
+		            verifyUserData(result, done);
+		        })
+		        .catch((error) => {
+			        console.error(error);
+			        Code.expect(error).to.be.undefined();
+			        done();
+		        });
+	});
+
+	lab.test("Test findById method", (done) => {
+		userRepo.findById(USER_REPO._id)
+		        .then((result) => {
+			        verifyUserData(result, done);
+		        })
+		        .catch((error) => {
+			        console.error(error);
+			        Code.expect(error).to.be.undefined();
+			        done();
+		        });
+	});
+
+	lab.test("Test findByIdAndUpdate method", (done) => {
+		USER_REPO.firstName = 'Jane';
+		USER_REPO.lastName = 'D';
+
+		userRepo.findByIdAndUpdate(USER_REPO._id, USER_REPO)
+		        .then((result) => {
+			        verifyUserData(result, done);
+		        })
+		        .catch((error) => {
+			        console.error(error);
+			        Code.expect(error).to.be.undefined();
+			        done();
+		        });
+	});
+
+	lab.test("Test findByIdAndDelete method", (done) => {
+		userRepo.findByIdAndDelete(USER_REPO._id)
+		        .then((result) => {
+			        Code.expect(result).to.have.length(0);
+			        done();
+		        })
+		        .catch((error) => {
+			        console.error(error);
+			        Code.expect(error).to.be.undefined();
+			        done();
+		        });
+	});
+});
 
 /**
  * Create User Test
  * Test for all adverse scenarios while creating a new user
  */
-lab.experiment("User API: Create New User - ", () => {
+lab.experiment("***** User API Tests *****", () => {
 
 	lab.test("Create a user with no password", (done) => {
 		const options: IServerInjectOptions = {
 			method : USER_API.CREATE.METHOD,
 			url    : USER_API.CREATE.URL,
 			payload: {
-				email    : USR_MODEL.EMAIL,
-				firstName: USR_MODEL.FIRSTNAME,
-				lastName : USR_MODEL.LASTNAME,
+				email    : USER_MODEL.EMAIL,
+				firstName: USER_MODEL.FIRSTNAME,
+				lastName : USER_MODEL.LASTNAME,
 			}
 		};
 
@@ -50,9 +156,9 @@ lab.experiment("User API: Create New User - ", () => {
 			method : USER_API.CREATE.METHOD,
 			url    : USER_API.CREATE.URL,
 			payload: {
-				email    : USR_MODEL.EMAIL,
-				lastName : USR_MODEL.LASTNAME,
-				password : USR_MODEL.PASSWORD
+				email    : USER_MODEL.EMAIL,
+				lastName : USER_MODEL.LASTNAME,
+				password : USER_MODEL.PASSWORD
 			}
 		};
 
@@ -69,9 +175,9 @@ lab.experiment("User API: Create New User - ", () => {
 			method : USER_API.CREATE.METHOD,
 			url    : USER_API.CREATE.URL,
 			payload: {
-				email    : USR_MODEL.EMAIL,
-				firstName: USR_MODEL.FIRSTNAME,
-				password : USR_MODEL.PASSWORD
+				email    : USER_MODEL.EMAIL,
+				firstName: USER_MODEL.FIRSTNAME,
+				password : USER_MODEL.PASSWORD
 			}
 		};
 
@@ -88,9 +194,9 @@ lab.experiment("User API: Create New User - ", () => {
 			method : USER_API.CREATE.METHOD,
 			url    : USER_API.CREATE.URL,
 			payload: {
-				firstName: USR_MODEL.FIRSTNAME,
-				lastName : USR_MODEL.LASTNAME,
-				password : USR_MODEL.PASSWORD
+				firstName: USER_MODEL.FIRSTNAME,
+				lastName : USER_MODEL.LASTNAME,
+				password : USER_MODEL.PASSWORD
 			}
 		};
 
@@ -108,9 +214,9 @@ lab.experiment("User API: Create New User - ", () => {
 			url    : USER_API.CREATE.URL,
 			payload: {
 				email    : 'invalid-email',
-				firstName: USR_MODEL.FIRSTNAME,
-				lastName : USR_MODEL.LASTNAME,
-				password : USR_MODEL.PASSWORD
+				firstName: USER_MODEL.FIRSTNAME,
+				lastName : USER_MODEL.LASTNAME,
+				password : USER_MODEL.PASSWORD
 			}
 		};
 
@@ -127,9 +233,9 @@ lab.experiment("User API: Create New User - ", () => {
 			method : USER_API.CREATE.METHOD,
 			url    : USER_API.CREATE.URL,
 			payload: {
-				email    : USR_MODEL.EMAIL,
-				firstName: USR_MODEL.FIRSTNAME,
-				lastName : USR_MODEL.LASTNAME,
+				email    : USER_MODEL.EMAIL,
+				firstName: USER_MODEL.FIRSTNAME,
+				lastName : USER_MODEL.LASTNAME,
 				password : 'invalid'
 			}
 		};
@@ -147,10 +253,10 @@ lab.experiment("User API: Create New User - ", () => {
 			method : USER_API.CREATE.METHOD,
 			url    : USER_API.CREATE.URL,
 			payload: {
-				email    : USR_MODEL.EMAIL,
-				firstName: USR_MODEL.FIRSTNAME,
-				lastName : USR_MODEL.LASTNAME,
-				password : USR_MODEL.PASSWORD
+				email    : USER_MODEL.EMAIL,
+				firstName: USER_MODEL.FIRSTNAME,
+				lastName : USER_MODEL.LASTNAME,
+				password : USER_MODEL.PASSWORD
 			}
 		};
 
@@ -167,10 +273,10 @@ lab.experiment("User API: Create New User - ", () => {
 			method : USER_API.CREATE.METHOD,
 			url    : USER_API.CREATE.URL,
 			payload: {
-				email    : USR_MODEL.EMAIL,
-				firstName: USR_MODEL.FIRSTNAME,
-				lastName : USR_MODEL.LASTNAME,
-				password : USR_MODEL.PASSWORD
+				email    : USER_MODEL.EMAIL,
+				firstName: USER_MODEL.FIRSTNAME,
+				lastName : USER_MODEL.LASTNAME,
+				password : USER_MODEL.PASSWORD
 			}
 		};
 
@@ -194,7 +300,7 @@ lab.experiment('User API: Login Test - ', () => {
 			url    : USER_API.LOGIN.URL,
 			payload: {
 				email    : 'anon@magicquill.in',
-				password : USR_MODEL.PASSWORD
+				password : USER_MODEL.PASSWORD
 			}
 		};
 
@@ -211,7 +317,7 @@ lab.experiment('User API: Login Test - ', () => {
 			method : USER_API.LOGIN.METHOD,
 			url    : USER_API.LOGIN.URL,
 			payload: {
-				email    : USR_MODEL.EMAIL,
+				email    : USER_MODEL.EMAIL,
 				password : 'incorrect-password'
 			}
 		};
@@ -229,7 +335,7 @@ lab.experiment('User API: Login Test - ', () => {
 			method : USER_API.LOGIN.METHOD,
 			url    : USER_API.LOGIN.URL,
 			payload: {
-				email: USR_MODEL.EMAIL,
+				email: USER_MODEL.EMAIL,
 			}
 		};
 
@@ -246,7 +352,7 @@ lab.experiment('User API: Login Test - ', () => {
 			method : USER_API.LOGIN.METHOD,
 			url    : USER_API.LOGIN.URL,
 			payload: {
-				password: USR_MODEL.PASSWORD,
+				password: USER_MODEL.PASSWORD,
 			}
 		};
 
@@ -263,14 +369,14 @@ lab.experiment('User API: Login Test - ', () => {
 			method : USER_API.LOGIN.METHOD,
 			url    : USER_API.LOGIN.URL,
 			payload: {
-				email    : USR_MODEL.EMAIL,
-				password : USR_MODEL.PASSWORD
+				email    : USER_MODEL.EMAIL,
+				password : USER_MODEL.PASSWORD
 			}
 		};
 
 		server.inject(options, (response: IServerInjectResponse) => {
 			const result: any = response.result;
-			USR_MODEL.TOKEN = result.token;
+			USER_MODEL.TOKEN = result.token;
 
 			Code.expect(response.statusCode).to.equal(201);
 			Code.expect(result.status).to.equal(STATUS.SUCCESSFUL);
@@ -291,10 +397,10 @@ lab.experiment('User API: Update User Test - ', () => {
 			method : USER_API.UPDATE.METHOD,
 			url    : USER_API.UPDATE.URL,
 			headers: {
-				'Authorization': USR_MODEL.TOKEN
+				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
-				oldPassword: USR_MODEL.PASSWORD,
+				oldPassword: USER_MODEL.PASSWORD,
 				newPassword: 'invalid'
 			}
 		};
@@ -312,7 +418,7 @@ lab.experiment('User API: Update User Test - ', () => {
 			method : USER_API.UPDATE.METHOD,
 			url    : USER_API.UPDATE.URL,
 			headers: {
-				'Authorization': USR_MODEL.TOKEN
+				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
 				oldPassword: 'incorrect-password',
@@ -333,7 +439,7 @@ lab.experiment('User API: Update User Test - ', () => {
 			method : USER_API.UPDATE.METHOD,
 			url    : USER_API.UPDATE.URL,
 			payload: {
-				oldPassword: USR_MODEL.PASSWORD,
+				oldPassword: USER_MODEL.PASSWORD,
 				newPassword: 'new-password-test',
 				firstName  : 'new first name',
 				firstLast  : 'new last name',
@@ -354,10 +460,10 @@ lab.experiment('User API: Update User Test - ', () => {
 			method : USER_API.UPDATE.METHOD,
 			url    : USER_API.UPDATE.URL,
 			headers: {
-				'Authorization': USR_MODEL.TOKEN
+				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
-				oldPassword: USR_MODEL.PASSWORD,
+				oldPassword: USER_MODEL.PASSWORD,
 				newPassword: 'new-password-test'
 			}
 		};
@@ -375,11 +481,11 @@ lab.experiment('User API: Update User Test - ', () => {
 			method : USER_API.UPDATE.METHOD,
 			url    : USER_API.UPDATE.URL,
 			headers: {
-				'Authorization': USR_MODEL.TOKEN
+				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
 				oldPassword: 'new-password-test',
-				newPassword: USR_MODEL.PASSWORD
+				newPassword: USER_MODEL.PASSWORD
 			}
 		};
 
@@ -396,7 +502,7 @@ lab.experiment('User API: Update User Test - ', () => {
 			method : USER_API.UPDATE.METHOD,
 			url    : USER_API.UPDATE.URL,
 			headers: {
-				'Authorization': USR_MODEL.TOKEN
+				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
 				firstName: 'Jane'
@@ -415,7 +521,7 @@ lab.experiment('User API: Update User Test - ', () => {
 			method : USER_API.UPDATE.METHOD,
 			url    : USER_API.UPDATE.URL,
 			headers: {
-				'Authorization': USR_MODEL.TOKEN
+				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
 				lastName: 'Smith'
@@ -435,7 +541,7 @@ lab.experiment('User API: Update User Test - ', () => {
 			method : USER_API.UPDATE.METHOD,
 			url    : USER_API.UPDATE.URL,
 			headers: {
-				'Authorization': USR_MODEL.TOKEN
+				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
 				email: 'invalid-email'
@@ -455,7 +561,7 @@ lab.experiment('User API: Update User Test - ', () => {
 			method : USER_API.UPDATE.METHOD,
 			url    : USER_API.UPDATE.URL,
 			headers: {
-				'Authorization': USR_MODEL.TOKEN
+				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
 				email: 'mystery@magicquill.in'
@@ -475,10 +581,10 @@ lab.experiment('User API: Update User Test - ', () => {
 			method : USER_API.UPDATE.METHOD,
 			url    : USER_API.UPDATE.URL,
 			headers: {
-				'Authorization': USR_MODEL.TOKEN
+				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
-				email: USR_MODEL.EMAIL
+				email: USER_MODEL.EMAIL
 			}
 		};
 
@@ -502,8 +608,8 @@ lab.experiment('User API: Delete User Test - ', () => {
 			method : USER_API.DELETE.METHOD,
 			url    : USER_API.DELETE.URL,
 			payload: {
-				email    : USR_MODEL.EMAIL,
-				password : USR_MODEL.PASSWORD
+				email    : USER_MODEL.EMAIL,
+				password : USER_MODEL.PASSWORD
 			}
 		};
 
@@ -521,10 +627,10 @@ lab.experiment('User API: Delete User Test - ', () => {
 			method : USER_API.DELETE.METHOD,
 			url    : USER_API.DELETE.URL,
 			headers: {
-				'Authorization': USR_MODEL.TOKEN
+				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
-				email    : USR_MODEL.EMAIL,
+				email    : USER_MODEL.EMAIL,
 				password : 'invalid-password'
 			}
 		};
@@ -542,11 +648,11 @@ lab.experiment('User API: Delete User Test - ', () => {
 			method : USER_API.DELETE.METHOD,
 			url    : USER_API.DELETE.URL,
 			headers: {
-				'Authorization': USR_MODEL.TOKEN
+				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
 				email    : 'mystery@magicquill.in',
-				password : USR_MODEL.PASSWORD
+				password : USER_MODEL.PASSWORD
 			}
 		};
 
@@ -563,11 +669,11 @@ lab.experiment('User API: Delete User Test - ', () => {
 			method : USER_API.DELETE.METHOD,
 			url    : USER_API.DELETE.URL,
 			headers: {
-				'Authorization': USR_MODEL.TOKEN
+				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
-				email    : USR_MODEL.EMAIL,
-				password : USR_MODEL.PASSWORD
+				email    : USER_MODEL.EMAIL,
+				password : USER_MODEL.PASSWORD
 			}
 		};
 
