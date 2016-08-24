@@ -1,7 +1,7 @@
 export interface IEntity {
     _id: string;
-    createdDate: Date;
-    updatedAt: Date;
+    createdDate: string;
+    updatedAt: string;
 }
 
 export interface IRepository<T extends IEntity> {
@@ -26,7 +26,7 @@ export interface IUser extends IEntity {
     password: string;
     isActive: boolean;
     userRole: string;
-	lastLogin: Date;
+	lastLogin: string;
 };
 
 export interface IUserRepository extends IRepository<IUser> {};

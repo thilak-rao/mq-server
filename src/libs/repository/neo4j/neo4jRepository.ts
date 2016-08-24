@@ -1,8 +1,9 @@
 import {IEntity, IRepository, INeo4j} from "../interfaces";
 import {NEO4J} from "../../../configs/environment";
 
-const UUID  = require("node-uuid");
-const neo4j = require('neo4j');
+const neo4j  = require('neo4j'),
+      UUID   = require("node-uuid"),
+      moment = require('moment');
 
 abstract class Neo4jRepository<T extends IEntity> implements IRepository<IEntity>  {
 	protected db: INeo4j;
@@ -30,7 +31,11 @@ abstract class Neo4jRepository<T extends IEntity> implements IRepository<IEntity
 
 		for (const key in entity) {
 			if (entity.hasOwnProperty(key)) {
-				query.push(`${variable}.${key}='${entity[key]}'`);
+				if (typeof entity[key] === 'boolean') {
+					query.push(`${variable}.${key}=${entity[key]}`);
+				} else {
+					query.push(`${variable}.${key}='${entity[key]}'`);
+				}
 			}
 		}
 		return query.join(', ');
@@ -44,31 +49,33 @@ abstract class Neo4jRepository<T extends IEntity> implements IRepository<IEntity
 
 	public create(entity: T): Promise<any> {
 		entity._id = UUID.v4();
+		entity.createdDate = moment().toJSON();
+		entity.updatedAt = moment().toJSON();
 		return new Promise((resolve, reject) => {
 			this.db.cypher({
 				query: `CREATE (n:${this.nodeName} {${this.stringifyEntity(entity)}}) RETURN n`,
 				params: entity
 			}, (error, results) => {
-				if (error) {
-					reject(error);
+				if (error !== null || typeof results === 'undefined') {
+					return reject(`Could not create ${this.nodeName} - id: ${entity._id}`);
 				}
 
-				resolve(results);
+				return resolve(this.formatProperties(results));
 			});
 		});
 	}
 
-	public find(filter: T, top?: number, skip?: number): Promise<Array<T>> {
+	public find(filter: any, top?: number, skip?: number): Promise<Array<T>> {
 		return new Promise((resolve, reject) => {
 			this.db.cypher({
 				query: `MATCH (n:${this.nodeName} {${this.stringifyEntity(filter)}}) RETURN n LIMIT ${top}`,
 				params: filter
 			}, (error, results) => {
-				if (error) {
-					reject(error);
+				if (error !== null || typeof results === 'undefined') {
+					return reject(`Could not find ${this.nodeName} with filter ${JSON.stringify(filter)}`);
 				}
 
-				resolve(this.formatProperties(results));
+				return resolve(this.formatProperties(results));
 			});
 		});
 	}
@@ -78,26 +85,26 @@ abstract class Neo4jRepository<T extends IEntity> implements IRepository<IEntity
 			this.db.cypher({
 				query: `MATCH (n:${this.nodeName}) WHERE (n._id = '${id}') RETURN n`,
 			}, (error, results) => {
-				if (error) {
-					reject(error);
+				if (error !== null || typeof results === 'undefined') {
+					return reject(`Could not find ${this.nodeName} by id ${id}`);
 				}
 
-				resolve(this.formatProperties(results));
+				return resolve(this.formatProperties(results));
 			});
 		});
 	}
 
-	public findByIdAndUpdate(id: string, entity: T): Promise<any> {
-        entity.updatedAt = new Date();
+	public findByIdAndUpdate(id: string, entity: any): Promise<any> {
+        entity.updatedAt = moment().toJSON();
 		return new Promise((resolve, reject) => {
 			this.db.cypher({
 				query: `MATCH (n:${this.nodeName}) WHERE (n._id = '${id}') SET ${this.updateEntity(entity, 'n')} RETURN n`,
 			}, (error, results) => {
-				if (error) {
-					reject(error);
+				if (error !== null || typeof results === 'undefined') {
+					return reject(`Could not find ${this.nodeName} and update by id ${id}`);
 				}
 
-				resolve(this.formatProperties(results));
+				return resolve(this.formatProperties(results));
 			});
 		});
 	}
@@ -107,11 +114,11 @@ abstract class Neo4jRepository<T extends IEntity> implements IRepository<IEntity
 			this.db.cypher({
 				query: `MATCH (n:${this.nodeName}) WHERE (n._id = '${id}') DELETE n`,
 			}, (error, results) => {
-				if (error) {
-					reject(error);
+				if (error !== null || typeof results === 'undefined') {
+					return reject(`Could not find ${this.nodeName} and delete by id ${id}`);
 				}
 
-				resolve(this.formatProperties(results));
+				return resolve(results);
 			});
 		});
 	}

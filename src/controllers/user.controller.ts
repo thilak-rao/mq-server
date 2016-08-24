@@ -9,6 +9,8 @@ import * as ErrorModel from '../models/error.model';
 import {USERROLES, STATUS, ERROR_MSG} from '../configs/constants';
 import { IUser, IUserRepository } from '../libs/repository/interfaces';
 
+const moment = require('moment');
+
 export default class UserController extends BaseController {
 	private userRepository: IUserRepository;
 	private utils: IUtils;
@@ -32,7 +34,7 @@ export default class UserController extends BaseController {
 					    newUser.password  = hash;
 					    newUser.isActive  = false;
 					    newUser.userRole  = USERROLES.STUDENT;
-					    newUser.lastLogin = new Date();
+					    newUser.lastLogin = moment().toJSON();
 
 
 					    return this.userRepository.create(newUser);
@@ -90,7 +92,7 @@ export default class UserController extends BaseController {
 							userRole
 						}).code(201);
 
-						user.lastLogin = new Date();
+						user.lastLogin = moment().toJSON();
 
 						return this.userRepository.findByIdAndUpdate(user._id, user);
 					})
