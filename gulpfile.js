@@ -6,8 +6,7 @@ const gulp       = require('gulp'),
       sourcemaps = require('gulp-sourcemaps'),
       tslint     = require('gulp-tslint'),
       nodemon    = require('gulp-nodemon'),
-      lab        = require('gulp-lab'),
-      istanbul   = require('gulp-istanbul');
+      lab        = require('gulp-lab');
 
 // Variables
 const tsProject      = tsc.createProject('tsconfig.json'),
