@@ -17,5 +17,6 @@ export const SERVER: IServerConfig = {
 export const AWS_CONFIG = {
 	region : 'ap-south-1', // Mumbai Region
 	secretkey: process.env.AWSSecretKey,
-	accesskey: process.env.AWSAccessKeyId
-}
+	accesskey: process.env.AWSAccessKeyId,
+	urlExpiry: (60 * 60) * 12 // 60 seconds x 60 minutes x 12 hours.
+};
