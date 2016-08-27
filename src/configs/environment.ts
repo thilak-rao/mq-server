@@ -15,7 +15,7 @@ export const SERVER: IServerConfig = {
 };
 
 export const AWS_CONFIG = {
-	location : 'ap-south-1', // Mumbai Region
+	region : 'ap-south-1', // Mumbai Region
 	secretkey: process.env.AWSSecretKey,
 	accesskey: process.env.AWSAccessKeyId
 }
