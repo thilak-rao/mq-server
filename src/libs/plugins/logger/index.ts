@@ -9,7 +9,7 @@ export default (): IPlugin => {
 	        const fileReporter = [{
 		        module: 'good-squeeze',
 		        name  : 'Squeeze',
-		        args  : [{log: '*', response: '*', 'error': '*', request: '*'}]
+		        args  : [{error: '*'}]
 	        }, {
 		        module: 'good-squeeze',
 		        name  : 'SafeJson'
@@ -21,7 +21,10 @@ export default (): IPlugin => {
 	        const consoleReporter = [{
 		        module: 'good-squeeze',
 		        name  : 'Squeeze',
-		        args  : [{log: '*', response: '*', 'error': '*', request: '*'}]
+		        args  : [{log: '*', error: '*'}]
+	        }, {
+		        module: 'good-squeeze',
+		        name  : 'SafeJson'
 	        }, {
 		        module: 'good-console'
 	        }, 'stdout'];

@@ -1,16 +1,16 @@
 /// <reference path="../typings/index.d.ts" />
 import server from "../src/server";
-import Utilties from "../src/libs/utils/utilities";
+import Utilities from "../src/libs/utils/utilities";
 import {IServerInjectResponse, IServerInjectOptions} from "hapi";
-import UserRepository from "../src/libs/repository/neo4j/userRepository";
+import UserRepository from "../src/libs/repository/neo4j/user.repository";
 import {STATUS, USER_API, USERROLES, ERROR_MSG} from "../src/configs/constants";
-import {IEntity, IUser} from "../src/libs/repository/interfaces";
+import {IUser} from "../src/libs/repository/interfaces";
 
 const Code   = require('code'),
       UUID   = require("node-uuid"),
       moment = require('moment'),
       Lab    = require('lab'),
-      utils  = new Utilties(),
+      utils  = new Utilities(),
       lab    = exports.lab = Lab.script();
 
 /**
@@ -37,7 +37,7 @@ const USER_REPO: IUser = {
 	userRole   : USERROLES.STUDENT
 };
 
-lab.experiment("***** User Repository *****", () => {
+lab.experiment("\n\n\n***** User Repository *****\n", () => {
 	const userRepo = new UserRepository();
 
 	const verifyUserData = (result: any, done: Function) => {
@@ -130,7 +130,7 @@ lab.experiment("***** User Repository *****", () => {
  * Create User Test
  * Test for all adverse scenarios while creating a new user
  */
-lab.experiment("***** User API Tests *****", () => {
+lab.experiment("\n\n\n***** User API Tests *****\n", () => {
 
 	lab.test("Create a user with no password", (done) => {
 		const options: IServerInjectOptions = {

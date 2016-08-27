@@ -33,7 +33,7 @@ plugins.forEach((pluginName: string) => {
 //Register Routes
 Routes(server);
 
-server.start(function () {
+server.start(() => {
 	console.log('Server running at:', server.info.uri);
 });
 

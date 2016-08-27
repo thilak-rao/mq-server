@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 // Import Gulp Plugins
 const gulp       = require('gulp'),
       rimraf     = require('gulp-rimraf'),
@@ -6,8 +6,7 @@ const gulp       = require('gulp'),
       sourcemaps = require('gulp-sourcemaps'),
       tslint     = require('gulp-tslint'),
       nodemon    = require('gulp-nodemon'),
-      lab        = require('gulp-lab'),
-      istanbul   = require('gulp-istanbul');
+      lab        = require('gulp-lab');
 
 // Variables
 const tsProject      = tsc.createProject('tsconfig.json'),
@@ -15,6 +14,8 @@ const tsProject      = tsc.createProject('tsconfig.json'),
       testFiles      = 'test/**/*.ts',
       publicFiles    = 'src/public/**/*',
       publicFilesOut = 'build/src/public',
+      mockFiles      = 'mocks/**/*',
+      mockFilesOut   = 'build/mocks',
       outDir         = require('./tsconfig.json').compilerOptions.outDir,
       entryPoint     = './build/src/server.js';
 
@@ -24,7 +25,7 @@ const tsProject      = tsc.createProject('tsconfig.json'),
 gulp.task('clean', () => {
     return gulp.src(outDir, { read: false })
         .pipe(rimraf())
-})
+});
 
 
 /**
@@ -36,7 +37,7 @@ gulp.task('tslint', () => {
             formatter: "verbose"
         }))
         .pipe(tslint.report());
-})
+});
 
 /**
  * Copy public files
@@ -44,7 +45,7 @@ gulp.task('tslint', () => {
 gulp.task('copy-public', ['compile'], () => {
     return gulp.src(publicFiles)
         .pipe(gulp.dest(publicFilesOut));
-})
+});
 
 /**
  * Compile TypeScript sources and create sourcemaps in build directory.
@@ -52,11 +53,11 @@ gulp.task('copy-public', ['compile'], () => {
 gulp.task('compile', ['clean'], () => {
     let tsResult = gulp.src([sourceFiles, testFiles])
         .pipe(sourcemaps.init())
-        .pipe(tsc(tsProject))
+        .pipe(tsc(tsProject));
     return tsResult.js
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(outDir))
-})
+});
 
 /**
  * Watch for changes in TypeScript, HTML and CSS files.
@@ -68,21 +69,29 @@ gulp.task('watch', () => {
 
     gulp.watch([testFiles], ['tslint', 'compile']).on('change', (e) => {
         console.log('TypeScript test file ' + e.path + ' has been changed. Compiling.')
-    })
+    });
 
     gulp.watch([publicFiles], ['copy-public']).on('change', (e) => {
         console.log('Client side file ' + e.path + ' has been changed. Copying.')
-    })
-})
+    });
+});
 
 /**
  * Build the project.
  */
 gulp.task('build', ['copy-public'], () => {
     console.log('Building the project ...')
-})
+});
 
-gulp.task('test', ['build'], () => {
+/**
+ * Copy mock files for tests
+ */
+gulp.task('copy-mocks', ['build'], () => {
+    return gulp.src(mockFiles)
+        .pipe(gulp.dest(mockFilesOut));
+});
+
+gulp.task('test', ['copy-mocks'], () => {
     return gulp.src(['build/test/**/*.js'], { read: false })
         .pipe(lab(['-v', '-C']))
         .once('error', () => {
@@ -91,7 +100,7 @@ gulp.task('test', ['build'], () => {
         .once('end', () => {
             process.exit();
         });
-})
+});
 
 
 gulp.task('nodemon', ['build'], () => {
@@ -99,4 +108,4 @@ gulp.task('nodemon', ['build'], () => {
         script: entryPoint,
         env: { 'NODE_ENV': 'development' }
     })
-})
+});

@@ -8,12 +8,12 @@ const neo4j  = require('neo4j'),
 abstract class Neo4jRepository<T extends IEntity> implements IRepository<IEntity>  {
 	protected db: INeo4j;
 
+	protected nodeName: string;
+
 	constructor() {
 		const url = `${NEO4J.protocol}${NEO4J.username}:${NEO4J.password}@${NEO4J.host}:${NEO4J.port}`;
 		this.db = new neo4j.GraphDatabase(url);
 	}
-
-	protected nodeName: string;
 
 	protected stringifyEntity(entity: T): string {
 		let query: Array<string> = [];
