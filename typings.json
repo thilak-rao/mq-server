@@ -7,7 +7,9 @@
     "hapi": "registry:dt/hapi#13.0.0+20160818163303",
     "joi": "registry:dt/joi#9.0.0+20160626220651",
     "jsonwebtoken": "registry:dt/jsonwebtoken#0.0.0+20160720062725",
-    "node-4": "registry:dt/node-4#4.0.0+20160826164342"
+    "node-4": "registry:dt/node-4#4.0.0+20160826164342",
+    "react": "registry:dt/react#0.14.0+20160817201227",
+    "react-dom": "registry:dt/react-dom#0.14.0+20160412154040"
   },
   "dependencies": {
     "hapi-auth-jwt2": "registry:npm/hapi-auth-jwt2#7.0.0+20160719164101"

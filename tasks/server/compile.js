@@ -3,7 +3,7 @@ module.exports = (gulp, plugins) => {
     const sourceFiles = './server/**/*.ts',
           tsc         = require('gulp-typescript'),
           tsProject   = tsc.createProject('./server/tsconfig.json'),
-          output      = require('../server/tsconfig.json').compilerOptions.outDir;
+          output      = require('../../server/tsconfig.json').compilerOptions.outDir;
 
     return () => {
         let stream = gulp.src([sourceFiles])
