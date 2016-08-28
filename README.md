@@ -16,7 +16,8 @@ A side project that is currently underway. Uses Hapi, TypeScript and Neo4j graph
 * gulp build - Build TS files
 * gulp test - Run Hapi Lap Tests
 * gulp tslint - Run tslint
-* gulp nodemon - Run nodemon and watch ts files
+* gulp watch - watch server source files and compile js. 
+* gulp start - Run nodemon which restarts on file change
 
 ** Environment Variables **
 * `AWSAccessKeyId` - AWS Access Key
