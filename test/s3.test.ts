@@ -1,7 +1,7 @@
 /// <reference path="../typings/index.d.ts" />
 
-import UserBucket from "../src/libs/buckets/user.bucket";
-import {STATUS} from "../src/configs/constants";
+import UserBucket from "../server/libs/buckets/user.bucket";
+import {STATUS} from "../server/configs/constants";
 const Lab     = require('lab'),
       Code    = require('code'),
       request = require('request'),

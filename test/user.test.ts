@@ -1,10 +1,10 @@
 /// <reference path="../typings/index.d.ts" />
-import server from "../src/server";
-import Utilities from "../src/libs/utils/utilities";
+import server from "../server/server";
+import Utilities from "../server/libs/utils/utilities";
 import {IServerInjectResponse, IServerInjectOptions} from "hapi";
-import UserRepository from "../src/libs/repository/neo4j/user.repository";
-import {STATUS, USER_API, USERROLES, ERROR_MSG} from "../src/configs/constants";
-import {IUser} from "../src/libs/repository/interfaces";
+import UserRepository from "../server/libs/repository/neo4j/user.repository";
+import {STATUS, USER_API, USERROLES, ERROR_MSG} from "../server/configs/constants";
+import {IUser} from "../server/libs/repository/interfaces";
 
 const Code   = require('code'),
       UUID   = require("node-uuid"),
