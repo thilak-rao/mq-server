@@ -43,3 +43,5 @@ gulp.task('build', ['compile'], () => {
  * Client Side Gulp Tasks
  */
 gulp.task('webpack:devserver', getTask('client/webpackdevserver'));
+
+gulp.task('client:tslint', getTask('client/tslint'));
