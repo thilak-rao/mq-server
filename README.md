@@ -3,8 +3,9 @@ A side project that is currently underway. Uses Hapi, TypeScript and Neo4j graph
 
 **Installation**
 
-* `npm install` (Install node modules)
-* `typings install` (Install type definitions)
+* `npm install` to install npm dependencies. 
+* `npm i -g typescript webpack gulp typings tslint` recommended globals. 
+* `typings install` to install TypeScript Type Definition files
 
 **Dependencies**
 
@@ -20,7 +21,7 @@ A side project that is currently underway. Uses Hapi, TypeScript and Neo4j graph
 * `gulp start` - Run nodemon which restarts on file change
 * `gulp webpack:devserver` - Serve and watch frontend files
 
-** Environment Variables **
+**Environment Variables**
 * `AWSAccessKeyId` - AWS Access Key
 * `AWSSecretKey` - AWS Secret Key
 * `Neo4jUser` - Neo4j username
@@ -32,4 +33,4 @@ For more fine tuning, have a look at `./src/configs/environment.ts`
 
 MagicQuill uses Swagger for API documentation - localhost:3000/documentation
 
-
+This project is still a work in progress! 
