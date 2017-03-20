@@ -111,7 +111,7 @@ export default class UserController extends BaseController {
 				'hapi-swagger': {
 					responses: {
 						'201': {
-							'description': 'Logs users to access MagicQuill resources, and returns a JSON Web Token',
+							'description': 'Logs users to access MQ resources, and returns a JSON Web Token',
 							'schema'     : UserModel.authenticationModel
 						},
 						'400': {
@@ -154,7 +154,7 @@ export default class UserController extends BaseController {
 				'hapi-swagger': {
 					responses: {
 						'201': {
-							'description': 'Deletes a given MagicQuill user account',
+							'description': 'Deletes a given MQ user account',
 							'schema'     : UserModel.deleteUserModel
 						},
 						'400': {
@@ -225,7 +225,7 @@ export default class UserController extends BaseController {
 				'hapi-swagger': {
 					responses: {
 						'201': {
-							'description': 'Updates a given MagicQuill user account',
+							'description': 'Updates a given MQ user account',
 							'schema'     : UserModel.updateUserModel
 						},
 						'400': {

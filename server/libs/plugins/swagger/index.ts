@@ -12,8 +12,8 @@ export default (): IPlugin => {
                     register: HapiSwagger,
                     options: {
                         info: {
-	                        title      : 'MagicQuill',
-	                        description: 'API documentation to access MagicQuill REST services',
+	                        title      : 'MQ',
+	                        description: 'API documentation to access MQ REST services',
 	                        version    : '0.1'
                         },
                         securityDefinitions: {
@@ -26,7 +26,7 @@ export default (): IPlugin => {
                         tags: [
                             {
                                 'name': 'user',
-                                'description': 'API to access MagicQuill User Resources'
+                                'description': 'API to access MQ User Resources'
                             }
                         ],
                         enableDocumentation: true,
