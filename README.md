@@ -1,4 +1,4 @@
-# MagicQuill
+# MQ
 A side project that is currently underway. Uses Hapi, TypeScript and Neo4j graph db. 
 
 **Installation**
@@ -30,6 +30,6 @@ For more fine tuning, have a look at `./src/configs/environment.ts`
 
 **API Documentation**
 
-MagicQuill uses Swagger for API documentation - localhost:3000/documentation
+MQ uses Swagger for API documentation - localhost:3000/documentation
 
 

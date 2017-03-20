@@ -3,7 +3,7 @@ import {ISDEBUG, AWS_CONFIG} from "../../configs/environment";
 import {STATUS} from "../../configs/constants";
 const s3   = require('s3'),
       AWS  = require('aws-sdk'),
-      UUID = require("node-uuid");
+      UUID = require("uuid/v4");
 
 abstract class S3Bucket {
 	protected S3;
@@ -26,7 +26,7 @@ abstract class S3Bucket {
 	}
 
 	public uploadFile(localFile: string): Promise<any> {
-		const uuid = UUID.v4();
+		const uuid = UUID();
 		const params = {
 			localFile: localFile,
 			s3Params : {
