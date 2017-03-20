@@ -38,10 +38,3 @@ gulp.task('start', ['build'], getTask('server/start'));
 gulp.task('build', ['compile'], () => {
     console.log('\n\n\n***** Building MagicQuill server *****\n');
 });
-
-/**
- * Client Side Gulp Tasks
- */
-gulp.task('webpack:devserver', getTask('client/webpackdevserver'));
-
-gulp.task('client:tslint', getTask('client/tslint'));

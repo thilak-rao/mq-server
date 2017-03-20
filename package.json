@@ -1,12 +1,12 @@
 {
-  "name": "magicquill",
+  "name": "mq",
   "version": "0.1.0",
-  "description": "MagicQuill - Learning Management",
+  "description": "MQ",
   "license": "UNLICENSED",
   "repository": {
     "url": "https://github.com/xthilakx/magicquill.git"
   },
-  "author": "Thilak Rao <thilak.rao@magicquill.in>",
+  "author": "Thilak Rao <me@thilak.in>",
   "scripts": {
     "test": "gulp test"
   },
@@ -35,8 +35,7 @@
     "react": "15.3.1",
     "react-dom": "15.3.1",
     "s3": "4.4.0",
-    "vision": "4.1.0",
-    "webpack": "1.13.2"
+    "vision": "4.1.0"
   },
   "devDependencies": {
     "clean-webpack-plugin": "0.1.10",
