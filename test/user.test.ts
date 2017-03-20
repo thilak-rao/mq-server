@@ -7,7 +7,7 @@ import {STATUS, USER_API, USERROLES, ERROR_MSG} from "../server/configs/constant
 import {IUser} from "../server/libs/repository/interfaces";
 
 const Code   = require('code'),
-      UUID   = require("node-uuid"),
+      UUID   = require("uuid/v4"),
       moment = require('moment'),
       Lab    = require('lab'),
       utils  = new Utilities(),
@@ -17,7 +17,7 @@ const Code   = require('code'),
  * Variables required to test user api
  */
 const USER_MODEL = {
-	EMAIL    : 'test@magicquill.in',
+	EMAIL    : 'test@mailinator.com',
 	FIRSTNAME: 'John',
 	LASTNAME : 'Doe',
 	PASSWORD : 'supersecret',
@@ -25,7 +25,7 @@ const USER_MODEL = {
 };
 
 const USER_REPO: IUser = {
-	_id        : UUID.v4(),
+	_id        : UUID(),
 	email      : USER_MODEL.EMAIL,
 	firstName  : USER_MODEL.FIRSTNAME,
 	lastName   : USER_MODEL.LASTNAME,
@@ -299,7 +299,7 @@ lab.experiment('User API: Login Test - ', () => {
 			method : USER_API.LOGIN.METHOD,
 			url    : USER_API.LOGIN.URL,
 			payload: {
-				email    : 'anon@magicquill.in',
+				email    : 'anon@mailinator.com',
 				password : USER_MODEL.PASSWORD
 			}
 		};
@@ -443,7 +443,7 @@ lab.experiment('User API: Update User Test - ', () => {
 				newPassword: 'new-password-test',
 				firstName  : 'new first name',
 				firstLast  : 'new last name',
-				email      : 'mystery@magicquill.in'
+				email      : 'mystery@mailinator.com'
 			}
 		};
 
@@ -564,7 +564,7 @@ lab.experiment('User API: Update User Test - ', () => {
 				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
-				email: 'mystery@magicquill.in'
+				email: 'mystery@mailinator.com'
 			}
 		};
 
@@ -651,7 +651,7 @@ lab.experiment('User API: Delete User Test - ', () => {
 				'Authorization': USER_MODEL.TOKEN
 			},
 			payload: {
-				email    : 'mystery@magicquill.in',
+				email    : 'mystery@mailinator.com',
 				password : USER_MODEL.PASSWORD
 			}
 		};

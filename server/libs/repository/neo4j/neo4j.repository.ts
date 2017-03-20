@@ -2,7 +2,7 @@ import {IEntity, IRepository, INeo4j} from "../interfaces";
 import {NEO4J} from "../../../configs/environment";
 
 const neo4j  = require('neo4j'),
-      UUID   = require("node-uuid"),
+      UUID   = require("uuid/v4"),
       moment = require('moment');
 
 abstract class Neo4jRepository<T extends IEntity> implements IRepository<IEntity>  {
@@ -48,7 +48,7 @@ abstract class Neo4jRepository<T extends IEntity> implements IRepository<IEntity
 	}
 
 	public create(entity: T): Promise<any> {
-		entity._id = UUID.v4();
+		entity._id = UUID();
 		entity.createdDate = moment().toJSON();
 		entity.updatedAt = moment().toJSON();
 		return new Promise((resolve, reject) => {
